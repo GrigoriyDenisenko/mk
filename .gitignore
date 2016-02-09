@@ -1,3 +1,7 @@
 /.idea
 *.log
+<<<<<<< HEAD
 *.kate-swp
+=======
+*.kate-swp
+>>>>>>> 3acbcc8b5b606fad61fca503702db6048c04b863
