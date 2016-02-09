@@ -32,7 +32,7 @@ class Loader{
         // регистрация собственного автозагрузчика в стеке автозагрузки (вместо __autoload())
         // стек функций автозагрузки - это массив, элементами которого являются автозагрузчики.
         // Порядок автозагрузчиков соответствует порядку их регистрации, при помощи spl_autoload_register.
-        echo __CLASS__;
+        // echo __CLASS__;
         spl_autoload_register(array(__CLASS__, 'load'));
         spl_autoload_register(array(__CLASS__, 'addNamespace'));
         // можно ещё добавить выгрузку через  spl_autoload_unregister()
@@ -52,9 +52,9 @@ class Loader{
     public static function addNamespace($classname){
         //@TODO:
         foreach ($this->namespaces as $name => $dir_path){
-            $pos = strpos($class, $name);
+            $pos = strpos($classname, $name);
             if($pos === 0){
-                $class_path = str_ireplace($name, '', $class);
+                $class_path = str_ireplace($name, '', $classname);
                 $path = $dir_path . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class_path) . '.php';
                 if(file_exists($path)){
                   include_once($path);
