@@ -1,3 +1,6 @@
 /.idea
 *.log
 *.kate-swp
+.buildpath
+.project
+/.settings
