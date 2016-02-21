@@ -53,12 +53,12 @@ class Loader{
      */
     
     public static function load($classname){
-        echo '<pre>';
-        echo "load ".$classname."\n";
+        // echo '<pre>';
+        // echo "load ".$classname."\n";
 		// убираем алиас Framework, заменив его на путь к текущему каталогу
 		$path = str_replace('Framework','',$classname);
 		$path = __DIR__ . str_replace("\\","/", $path) . '.php';
-        echo "include_once ".$path;
+        // echo "include_once ".$path;
         // может для windows использовать вместо "/" DIRECTORY_SEPARATOR
 		if(file_exists($path)){
 			include_once($path);
@@ -96,11 +96,11 @@ class Loader{
     * @param string $path - директория для файлов классов из пространства имён.
     */
     public static function addNamespacePath($namespace, $path){
-        echo "   namespace=".$namespace."," ;
-        echo "   path=".$path."," ;
+        //echo "   namespace=".$namespace."," ;
+        //echo "   path=".$path."," ;
         if(is_dir($path)){
             $namespace = rtrim($namespace,'\\');
-            echo "   new namespace=".$namespace."," ;
+            //echo "   new namespace=".$namespace."," ;
             self::$namespaces[$namespace] = $path;
         }
         // $ldr = self::getInstance();

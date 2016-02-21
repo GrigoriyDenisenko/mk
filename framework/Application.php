@@ -25,7 +25,8 @@ class Application {
         if(!empty($route)){
         } else {
         }
-        echo '<pre>';
+        // echo '<pre>';
+        // echo 'Returned route: <BR>';
         print_r($route);
     }
 }
