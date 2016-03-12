@@ -38,7 +38,9 @@ class Loader{
         spl_autoload_register(array(__CLASS__, 'load'));
 		// $obj = new $ClassName теперь пойдёт через Loader::load($ClassName)
 		
-        spl_autoload_register(array(__CLASS__, 'addNamespace'));
+        // зарегистрируем Namespace фреймворка
+        self::addNamespacePath("Framework\\", __DIR__);
+        // spl_autoload_register(array(__CLASS__, 'addNamespace'));
         // можно ещё добавить выгрузку через  spl_autoload_unregister()
     }
 
@@ -52,16 +54,22 @@ class Loader{
 	 * /var/www.../текущий_каталог="Framework"/ClassDir/CassName.php
      */
     
-    public static function load($classname){
+    public static function load($className){
         // echo '<pre>';
-        // echo "load ".$classname."\n";
-		// убираем алиас Framework, заменив его на путь к текущему каталогу
-		$path = str_replace('Framework','',$classname);
-		$path = __DIR__ . str_replace("\\","/", $path) . '.php';
-        // echo "include_once ".$path;
-        // может для windows использовать вместо "/" DIRECTORY_SEPARATOR
-		if(file_exists($path)){
-			include_once($path);
+        // echo "load ".$className."\n";
+		
+		$namespaceName = strtok($className, "\\");
+        // echo "$namespaceName=" . $namespaceName;
+		
+		if(array_key_exists($namespaceName, self::$namespaces)) {
+            $namespacePath = self::$namespaces[$namespaceName];
+            // echo "namespacePath" . $namespacePath;
+            $path = str_replace("\\", DIRECTORY_SEPARATOR, $namespacePath . str_replace($namespaceName, "", $className)) . ".php";
+            if (file_exists($path)) {
+                // echo '<pre>';
+                // echo "include_once ".$path;
+                include_once($path);
+            }
 		}
     }
     

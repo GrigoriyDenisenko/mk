@@ -26,6 +26,7 @@ class Service {
      * @return object - экземпляр сервиса, или null, если не зарегистрирован сервис с таким именем
      */
     public static function get($service_name){
+		// return array_key_exists($service_name, self::$_services) ? self::$_services[$service_name] : null
         // ToDo: вместо null создать сервис
         return empty(self::$services[$service_name]) ? null : self::$services[$service_name];
     }
