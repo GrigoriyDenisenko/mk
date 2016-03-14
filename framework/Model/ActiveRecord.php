@@ -11,7 +11,12 @@ abstract class ActiveRecord {
      * Class constructor
      */
     public function __construct(){
+        echo 'ActiveRecord construct' ;
+    }
 
+    public function getRules(){
+        echo 'getRules' ;
+        return [];
     }
 
     public static function getDBCon(){
@@ -30,6 +35,7 @@ abstract class ActiveRecord {
      * а иначе все записи - $mode = 'all'
      */
     public static function find($mode = 'all'){
+        echo 'ActiveRecord find with mode'. $mode ;
 
         $table = static::getTable();
 
@@ -54,6 +60,16 @@ abstract class ActiveRecord {
 
     public function save(){
         $fields = $this->getFields();
+
+        $all_rules = $this->getRules();
+
+        foreach($all_rules as $name => $rules){
+            if(array_key_exists($name, $fields)){
+                foreach($rules as $rule){
+                    $valid = $rule->isValid($fields[$name]);
+                }
+            }
+        }
 
         // @TODO: build SQL expression, execute
     }

@@ -4,6 +4,7 @@ namespace Framework;
 
 use Framework\Controller\Controller;
 use Framework\Router\Router;
+use Framework\Renderer\Renderer;
 use Framework\Response\Response;
 use Framework\Response\ResponseRedirect;
 use Framework\Exception\BadResponseTypeException;
@@ -21,18 +22,21 @@ class Application {
     {
 	    // echo 'Create APP with config: '. $config_path;
 		// Берём значения из конфига APP и часто используемые инициализируем как сервисы
+
         $config = include_once $config_path;
+
 		// из значения 'routes' получаем путь к таблице маршрутов
 		// подгружаем роутер и инициализируем таблицу маршрутизации
         Service::set("router", new Router($config["routes"]));
-		
-        //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));		
+        //Service::set('renderer', new Renderer($config["main_layout"]));
+        Service::set('renderer', new Renderer($config));
+
+        //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
 		
 /*         Service::set('config', include($config_path));
-        Service::set('router', ObjectPool::get('Framework\Router\Router', Service::get('config')['routes']));
         Service::set('loader', ObjectPool::get('Loader'));
-        Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
-        Service::set('request', ObjectPool::get('Framework\Request\Request'));
+        Service::set('renderer','Framework\Renderer\Renderer');
+        Service::set('request', 'Framework\Request\Request');
         extract(Service::get('config')['pdo']);
         $dns .= ';charset=latin1';
         $db = new \PDO($dns, $user, $password);
@@ -80,7 +84,7 @@ class Application {
                         $params = $actionReflection->getParameters();
                         //Вызов метода (кот. описан в Action)
                         if(empty($params)) {
-                            // echo "<br> NO PARAMETERS on '$actionReflection' <br />";
+                            echo "<br> NO PARAMETERS on '$actionReflection' <br />";
                             $response = $actionReflection->invoke($controller);
                         } else {
 							//  с передачей аргументов
@@ -89,13 +93,14 @@ class Application {
                             $response = $actionReflection->invokeArgs($controller, $route['params']);
                         }
        			        // $response = $actionReflection->invokeArgs($controller, $route['params']);
-                        // echo "<br> +++Response: <br />";
-                        // print_r($response);
+                        echo "<br> +++Response: <br />";
+                        print_r($response);
                         // Если ответ пришел в виде класса - экземпляра экземпляра Response
        			        if ($response instanceof Response){
                             // Значит всё нормально - пришел правильный ответ
                             // echo "<br> +++Response: <br />";
                             // print_r($response);
+
         		        } else {
         		            throw new BadResponseTypeException('Ooops');
         		        }

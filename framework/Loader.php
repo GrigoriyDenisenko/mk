@@ -12,7 +12,7 @@ class Loader{
      
     // массив - сисок дирректорий используемых как пространство имён
 	// ключи массива содержат префикс пространства имён
-	protected static $namespaces = array();
+	private static $namespaces = array();
 
     public static function getInstance(){
         /**
@@ -47,7 +47,7 @@ class Loader{
 	/**
      * Загружаем переданный через переменную $classname класс.
      *
-     * @param string $classname вызываемый класс
+     * @param string $className вызываемый класс
 	 * $app = new \Framework\ClassDir\CassName - 
 	 * передаст \Framework\ClassDir\CassName через $classname
 	 * загрузится CassName.php находяшийся ниже текущего каталога
@@ -77,7 +77,7 @@ class Loader{
      */
     public static function addNamespace($classname){
         //@TODO:
-        foreach ($this->namespaces as $name => $dir_path){
+        foreach (self::$namespaces as $name => $dir_path){
             $pos = strpos($classname, $name);
             if($pos === 0){
                 $class_path = str_ireplace($name, '', $classname);
@@ -104,11 +104,11 @@ class Loader{
     * @param string $path - директория для файлов классов из пространства имён.
     */
     public static function addNamespacePath($namespace, $path){
-        //echo "   namespace=".$namespace."," ;
-        //echo "   path=".$path."," ;
+        // echo "   namespace=".$namespace."," ;
+        // echo "   path=".$path."," ;
         if(is_dir($path)){
             $namespace = rtrim($namespace,'\\');
-            //echo "   new namespace=".$namespace."," ;
+            // echo "   new namespace=".$namespace."," ;
             self::$namespaces[$namespace] = $path;
         }
         // $ldr = self::getInstance();

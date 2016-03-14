@@ -11,26 +11,35 @@ class Renderer {
     /**
      * @var string  Main wrapper template file location
      */
-    protected $main_template = '';
-    protected $error_template = '';
+
+    protected static $main_template = '';
+    protected static $error_template = '';
 
     /**
      * Class instance constructor
      *
-     * @param $main_template_file
+     * @param array $config
+     * $main_template_file
+     * $error_template_file
      */
-    public function __construct($main_template_file){
+    public function __construct($config = array()){
         // в app _construct через session создаем renderer с заданным шаблоном
+        $main_template_file = $config["main_layout"];
+        $error_template_file = $config["error_500"];
         if (file_exists($main_template_file)){
-            $this->$main_template = $main_template_file;
+            //$main_template ='';
+            self::$main_template = $main_template_file;
+            self::$error_template = $error_template_file;
+            echo " main_template_file is set to ".$main_template_file ;
         }else{
-			// типа не заморачиваясь в app
-            $dir = Service::get('session')->get('path_to_view');
-            $this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
+            echo "Template NOT FOUND ";
+
+            //$dir = Service::get('session')->get('path_to_view');
+            //$this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
         }
 
 		
-        $this->main_template = $main_template_file;
+        //$this->main_template = $main_template_file;
     }
 
     /**
@@ -46,14 +55,14 @@ class Renderer {
 
         $this->content = $content;
 
-        if (file_exists($layout)){
+ /*       if (file_exists($layout)){
             $this->layout = $layout;
         }else{
             $dir = Service::get('session')->get('path_to_view');
             $this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
-        }
+        }*/
 
-        return $this->render($this->main_template, compact('content'), false);
+        return $this->render($this -> $main_template, compact('content'), false);
     }
 
     /**
