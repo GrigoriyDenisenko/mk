@@ -2,19 +2,15 @@
 
 namespace Framework\Model;
 
+use Framework\DI\Service;
+use Framework\Exception\DatabaseException;
+
 
 abstract class ActiveRecord {
 
     protected static $db = null;
 
-    /**
-     * Class constructor
-     */
-    public function __construct(){
-        echo 'ActiveRecord construct' ;
-    }
-
-    public function getRules(){
+/*    public function getRules(){
         echo 'getRules' ;
         return [];
     }
@@ -27,19 +23,25 @@ abstract class ActiveRecord {
 
         return self::$db;
     }
-
-    public abstract function getTable();
+*/
+    public abstract static function getTable();
+    //public abstract function getTable();
 
     /**
+     *  @param $mode
      * Получить 1 запись, если задан идентификатор ($mode) записи
      * а иначе все записи - $mode = 'all'
      */
     public static function find($mode = 'all'){
-        echo 'ActiveRecord find with mode'. $mode ;
 
         $table = static::getTable();
 
-        $sql = "SELECT * FROM " . $table;
+        echo '<BR> ! ActiveRecord->find with mode= '. $mode . '<BR> TABLE: ' . $table;
+        $db = Service::get('db');
+
+
+        //echo '!!!!!ActiveRecord find with mode '. $mode . ' TABLE: ' . $table;
+/*        $sql = "SELECT * FROM " . $table;
 
         if(is_numeric($mode)){
             $sql .= " WHERE id=".(int)$mode;
@@ -50,10 +52,10 @@ abstract class ActiveRecord {
 
         // PDO request...
 
-        return $result;
+        return $result;*/
     }
 
-    protected function getFields(){
+    /*protected function getFields(){
 
         return get_object_vars($this);
     }
@@ -72,5 +74,5 @@ abstract class ActiveRecord {
         }
 
         // @TODO: build SQL expression, execute
-    }
+    }*/
 }

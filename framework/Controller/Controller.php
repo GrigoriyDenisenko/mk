@@ -33,6 +33,7 @@ abstract class Controller {
      */
     public function render($Layout, $Data = array()){
         echo 'RENDER!!!!!!!!!!!!!';
+
         //$renderer = new Renderer($layout, $content);
         //return new Response($renderer->render());
     }

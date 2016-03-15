@@ -55,8 +55,8 @@ class Loader{
      */
     
     public static function load($className){
-        // echo '<pre>';
-        // echo "load ".$className."\n";
+        echo '<pre>';
+        echo "load ".$className."\n";
 		
 		$namespaceName = strtok($className, "\\");
         // echo "$namespaceName=" . $namespaceName;

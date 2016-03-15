@@ -29,19 +29,27 @@ class Application {
 		// подгружаем роутер и инициализируем таблицу маршрутизации
         Service::set("router", new Router($config["routes"]));
         //Service::set('renderer', new Renderer($config["main_layout"]));
+        // в renderer передадим весь конфиг, а там возьмем пути к view
+        //Service::set('renderer','Framework\Renderer\Renderer');
         Service::set('renderer', new Renderer($config));
+        try{
+            // получим подключение к базе
+            // extract(Service::get('config')['pdo']);
+            // $dns .= ';charset=utf8';
+            // $db = new \PDO($dns, $user, $password);
+            // Service::set('db', $db);
+            Service::set('db', new \PDO($config['pdo']['dsn'], $config['pdo']['user'], $config['pdo']['password']));
+        }catch(\PDOException $e){
+            echo $e->getMessage();die();
+        }
+
 
         //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
 		
 /*         Service::set('config', include($config_path));
-        Service::set('loader', ObjectPool::get('Loader'));
-        Service::set('renderer','Framework\Renderer\Renderer');
+        Service::set('loader', 'Loader');
         Service::set('request', 'Framework\Request\Request');
-        extract(Service::get('config')['pdo']);
-        $dns .= ';charset=latin1';
-        $db = new \PDO($dns, $user, $password);
-        Service::set('db', $db);
- */    
+ */
     }
 	/**
 	 * Запуск роутера, запуск нужного контроллера, отдает респонс
