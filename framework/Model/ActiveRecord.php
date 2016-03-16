@@ -25,7 +25,6 @@ abstract class ActiveRecord {
     }
 */
     public abstract static function getTable();
-    //public abstract function getTable();
 
     /**
      *  @param $mode
@@ -36,24 +35,49 @@ abstract class ActiveRecord {
 
         $table = static::getTable();
 
-        echo '<BR> ! ActiveRecord->find with mode= '. $mode . '<BR> TABLE: ' . $table;
         $db = Service::get('db');
+        $query = "SELECT * FROM " . $table;
 
-
-        //echo '!!!!!ActiveRecord find with mode '. $mode . ' TABLE: ' . $table;
-/*        $sql = "SELECT * FROM " . $table;
 
         if(is_numeric($mode)){
-            $sql .= " WHERE id=".(int)$mode;
+            $query .= " WHERE id=".(int)$mode;
         }
         else{
 
         }
-
+        echo '<BR>ActiveRecord find with mode '. $mode . ' TABLE: ' . $table;
+        echo '<BR>query= '.$query;
         // PDO request...
-
-        return $result;*/
+        $result = array();
+        $sql = $db->prepare($query);
+        $sql->execute();
+        if ($sql === false) {
+            throw new DatabaseException('Database reading error: ' . $db->errorCode());
+        }
+        // PDO: Fetch class option to send fields to constructor as array
+        $result=$sql->fetchAll(\PDO::FETCH_CLASS, get_called_class());
+        // get_called_class - должен сам заполнить поля класса, созданного на базе нашего ActiveRecord
+        //
+        echo '<BR>RESULT from table "'.$table.'":<BR>';
+        print_r($result);
+        return $result;
     }
+
+/*How about using magic __set() method:
+class MyClass
+{
+    protected $record = array();
+
+    function __set($name, $value) {
+        $this->record[$name] = $value;
+    }
+}
+$results->setFetchMode(PDO::FETCH_CLASS, 'MyClass');
+
+PHP will call this magic method for every non-existent property passing in its name and value.*/
+
+
+
 
     /*protected function getFields(){
 

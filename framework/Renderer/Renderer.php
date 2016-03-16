@@ -14,6 +14,7 @@ class Renderer {
 
     protected static $main_template = '';
     protected static $error_template = '';
+    protected static $templates_dir = '';
 
     /**
      * Class instance constructor
@@ -24,22 +25,19 @@ class Renderer {
      */
     public function __construct($config = array()){
         // в app _construct через session создаем renderer с заданным шаблоном
-        $main_template_file = $config["main_layout"];
-        $error_template_file = $config["error_500"];
+        $main_template_file = realpath($config["main_layout"]);
+        $error_template_file = realpath($config["error_500"]);
         if (file_exists($main_template_file)){
-            //$main_template ='';
             self::$main_template = $main_template_file;
             self::$error_template = $error_template_file;
-            echo " main_template_file is set to ".$main_template_file ;
+            self::$templates_dir=dirname($main_template_file)."/";
+            echo "<BR>main_template_file is set to: ".$main_template_file ;
         }else{
             echo "Template NOT FOUND ";
 
             //$dir = Service::get('session')->get('path_to_view');
             //$this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
         }
-
-		
-        //$this->main_template = $main_template_file;
     }
 
     /**
@@ -75,6 +73,9 @@ class Renderer {
      * @return  text/html
      */
     public function render($template_path, $data = array(), $wrap = true){
+        echo "<BR>Renderer->render: ";
+        $template_path=self::$templates_dir . $template_path;
+        echo $template_path;
 
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
         // @TODO: provide all required vars or closures...
