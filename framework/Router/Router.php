@@ -33,8 +33,8 @@ class Router{
 		$url = empty($url) ? $_SERVER['REQUEST_URI'] : $url;
         
 		$route_found = null;
-        // echo "<pre>";
-        // echo "parse Url: ".$url.'<br />';
+        echo "<pre>";
+        echo "---------parse Url: ".$url.'<br />';
 		$url=preg_replace('~^\\/index.php$~i', '/', $url);
 		
         foreach(self::$map as $route){

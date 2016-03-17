@@ -93,6 +93,7 @@ class Application {
                         //Вызов метода (кот. описан в Action)
                         if(empty($params)) {
                             echo "<br> NO PARAMETERS on '$actionReflection' <br />";
+                            //new Response('test');
                             $response = $actionReflection->invoke($controller);
                         } else {
 							//  с передачей аргументов

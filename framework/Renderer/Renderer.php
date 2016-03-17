@@ -48,19 +48,14 @@ class Renderer {
      * @return html/text
      */
     public function renderMain($content){
+        echo "<BR>RendererMain<BR> ";
 
         //@TODO: set all required vars and closures..
 
-        $this->content = $content;
-
- /*       if (file_exists($layout)){
-            $this->layout = $layout;
-        }else{
-            $dir = Service::get('session')->get('path_to_view');
-            $this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
-        }*/
-
-        return $this->render($this -> $main_template, compact('content'), false);
+        //$this->content = $content;
+        // рендерим страницу из главного шаблона, внутрь которого
+        // в переменную $content передаём ранее сгенерированный контент
+        return self::render(self::$main_template, compact('content'), false);
     }
 
     /**
@@ -74,19 +69,29 @@ class Renderer {
      */
     public function render($template_path, $data = array(), $wrap = true){
         echo "<BR>Renderer->render: ";
-        $template_path=self::$templates_dir . $template_path;
-        echo $template_path;
+        if (!file_exists($template_path)){
+            $template_path=self::$templates_dir . $template_path;
+        }
+
+        echo "<BR>Template: ". $template_path;
 
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
         // @TODO: provide all required vars or closures...
 
-        ob_start(); // Включение буферизации вывода
-        include( $template_path ); //подключаем шаблон который задаётся в application
-        $content = ob_end_clean(); //Получить содержимое текущего буфера и удалить его а затем вернуть
-
+        if (file_exists($template_path)) {
+            //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
+            ob_start();
+            include( $template_path ); //выгружаем в буфер шаблон (html.php)
+            $content = ob_get_contents(); //получаем содержимое текущего буфера в виде строки и очищаем его
+            ob_end_clean();
+            //echo $content;
+        } else {
+            throw new \Exception('File ' . $template_path . ' not found');
+        }
         if($wrap){
 			// наш шаблон находится внутри главного шаблона
-            $content = $this->renderMain($content);
+            echo "WRAP-------------------";
+            $content = self::renderMain($content);
         }
 
         return $content;

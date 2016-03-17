@@ -35,7 +35,7 @@ abstract class Controller {
      * @return  Response
      */
     public function render($Layout, $Data = array()){
-        echo '<BR> RENDER Layout: '. $Layout;
+        echo '<BR>CONTROLLER renderer input layout: '. $Layout;
         echo '<BR>------DATA:-------<BR>';
         echo print_r($Data);
         $class = get_called_class();

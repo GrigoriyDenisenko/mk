@@ -59,15 +59,15 @@ class Loader{
         echo "load ".$className."\n";
 		
 		$namespaceName = strtok($className, "\\");
-        // echo "$namespaceName=" . $namespaceName;
+        //echo "namespaceName= " . $namespaceName;
 		
 		if(array_key_exists($namespaceName, self::$namespaces)) {
             $namespacePath = self::$namespaces[$namespaceName];
-            // echo "namespacePath" . $namespacePath;
+            //echo "<BR>namespacePath= " . $namespacePath;
             $path = str_replace("\\", DIRECTORY_SEPARATOR, $namespacePath . str_replace($namespaceName, "", $className)) . ".php";
             if (file_exists($path)) {
-                // echo '<pre>';
-                // echo "include_once ".$path;
+                //echo '<pre>';
+                echo "include_once ".$path;
                 include_once($path);
             }
 		}
@@ -109,7 +109,7 @@ class Loader{
         if(is_dir($path)){
             $namespace = rtrim($namespace,'\\');
             // echo "   new namespace=".$namespace."," ;
-            self::$namespaces[$namespace] = $path;
+            self::$namespaces[$namespace] = realpath($path);
         }
         // $ldr = self::getInstance();
         // $ldr->namespaces[$name] = $path;
