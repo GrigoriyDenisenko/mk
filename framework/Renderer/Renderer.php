@@ -2,6 +2,8 @@
 
 namespace Framework\Renderer;
 
+use Framework\DI\Service;
+
 /**
  * Class Renderer
  * @package Framework\Renderer
@@ -12,9 +14,9 @@ class Renderer {
      * @var string  Main wrapper template file location
      */
 
-    protected static $main_template = '';
-    protected static $error_template = '';
-    protected static $templates_dir = '';
+    protected $main_template = '';
+    protected $error_template = '';
+    protected $templates_dir = '';
 
     /**
      * Class instance constructor
@@ -27,13 +29,15 @@ class Renderer {
         // в app _construct через session создаем renderer с заданным шаблоном
         $main_template_file = realpath($config["main_layout"]);
         $error_template_file = realpath($config["error_500"]);
+
         if (file_exists($main_template_file)){
-            self::$main_template = $main_template_file;
-            self::$error_template = $error_template_file;
-            self::$templates_dir=dirname($main_template_file)."/";
+            $this->main_template = $main_template_file;
+            $this->error_template = $error_template_file;
+            $this->templates_dir=dirname($main_template_file)."/";
             echo "<BR>main_template_file is set to: ".$main_template_file ;
         }else{
-            echo "Template NOT FOUND ";
+            echo "Template NOT FOUND <BR>";
+            var_dump($config);
 
             //$dir = Service::get('session')->get('path_to_view');
             //$this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
@@ -50,12 +54,13 @@ class Renderer {
     public function renderMain($content){
         echo "<BR>RendererMain<BR> ";
 
-        //@TODO: set all required vars and closures..
+        $flush = [];
+        $user = Service::get('security')->getUser();
 
-        //$this->content = $content;
         // рендерим страницу из главного шаблона, внутрь которого
         // в переменную $content передаём ранее сгенерированный контент
-        return self::render(self::$main_template, compact('content'), false);
+        //$this->content = $content;
+        return $this->render($this->main_template, compact('content', 'user', 'flush'), false);
     }
 
     /**
@@ -69,14 +74,36 @@ class Renderer {
      */
     public function render($template_path, $data = array(), $wrap = true){
         echo "<BR>Renderer->render: ";
+
         if (!file_exists($template_path)){
-            $template_path=self::$templates_dir . $template_path;
+            $template_path=$this->templates_dir . $template_path;
+
         }
 
         echo "<BR>Template: ". $template_path;
 
+        $include = function($controller, $action, $args = array()) {
+            $controllerInstance = new $controller();
+            if ($args === null) {
+                $args = array();
+            }
+            return call_user_func_array(array($controllerInstance, $action.'Action'), $args);
+        };
+
+        $generateToken = function(){
+            $token = md5('solt_string'.uniqid());
+            setcookie('token', $token);
+            echo '<input type="hidden" value="'.$token.'" name="token">';
+        };
+
+        $getRoute = function($name){
+            if( array_key_exists( $name, Service::get('routes'))) {
+                $uri = Service::get('routes')[$name]['pattern'];
+                echo $uri;
+            }
+        };
+
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
-        // @TODO: provide all required vars or closures...
 
         if (file_exists($template_path)) {
             //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
@@ -88,10 +115,11 @@ class Renderer {
         } else {
             throw new \Exception('File ' . $template_path . ' not found');
         }
+
         if($wrap){
-			// наш шаблон находится внутри главного шаблона
-            echo "WRAP-------------------";
-            $content = self::renderMain($content);
+            // наш шаблон находится внутри главного шаблона
+            echo "<HR>WRAP<BR>";
+            $content = $this->renderMain($content);
         }
 
         return $content;

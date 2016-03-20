@@ -10,20 +10,20 @@ abstract class ActiveRecord {
 
     protected static $db = null;
 
-/*    public function getRules(){
-        echo 'getRules' ;
-        return [];
-    }
-
-    public static function getDBCon(){
-
-        if(empty(self::$db)){
-            self::$db = Service::get('db');
+    /*    public function getRules(){
+            echo 'getRules' ;
+            return [];
         }
 
-        return self::$db;
-    }
-*/
+        public static function getDBCon(){
+
+            if(empty(self::$db)){
+                self::$db = Service::get('db');
+            }
+
+            return self::$db;
+        }
+    */
     public abstract static function getTable();
 
     /**
@@ -36,45 +36,59 @@ abstract class ActiveRecord {
         $table = static::getTable();
 
         $db = Service::get('db');
-        $query = "SELECT * FROM " . $table;
+        $querystring = "SELECT * FROM " . $table;
 
+//        if(is_numeric($mode)){
+//            $query .= " WHERE id=".(int)$mode;
+//        }
+//        else{
+//
+//        }
 
-        if(is_numeric($mode)){
-            $query .= " WHERE id=".(int)$mode;
-        }
-        else{
-
+        if (is_numeric($mode)) {
+            $querystring .= " WHERE id = :id";
+            $query = $db->prepare($querystring);
+            $query->bindParam(":id", $mode, \PDO::PARAM_INT, 11);
+            $check_query_result = $query->execute();
+        } else {
+            $querystring .= " ORDER BY date";
+            $query = $db->query($querystring);
+            $check_query_result = $query;
         }
         echo '<BR>ActiveRecord find with mode '. $mode . ' TABLE: ' . $table;
-        echo '<BR>query= '.$query;
+        echo '<BR>querystring= '.$querystring;
         // PDO request...
-        $result = array();
-        $sql = $db->prepare($query);
-        $sql->execute();
-        if ($sql === false) {
-            throw new DatabaseException('Database reading error: ' . $db->errorCode());
+        // $result = array();
+        // $sql = $db->prepare($query);
+        // $sql->execute();
+        if ($check_query_result === false) {
+            $error_code = is_numeric($mode) ? $query->errorCode() : $db->errorCode();
+            throw new DatabaseException('Database reading error: ' . $error_code);
         }
         // PDO: Fetch class option to send fields to constructor as array
-        $result=$sql->fetchAll(\PDO::FETCH_CLASS, get_called_class());
+        $result=$query->fetchAll(\PDO::FETCH_CLASS, get_called_class());
         // get_called_class - должен сам заполнить поля класса, созданного на базе нашего ActiveRecord
         //
         echo '<BR>RESULT from table "'.$table.'":<BR>';
-        print_r($result);
+        var_dump($result);
+        if (is_numeric($mode) && isset($result[0])) {
+            return $result[0];
+        }
         return $result;
     }
 
-/*How about using magic __set() method:
-class MyClass
-{
-    protected $record = array();
+    /*How about using magic __set() method:
+    class MyClass
+    {
+        protected $record = array();
 
-    function __set($name, $value) {
-        $this->record[$name] = $value;
+        function __set($name, $value) {
+            $this->record[$name] = $value;
+        }
     }
-}
-$results->setFetchMode(PDO::FETCH_CLASS, 'MyClass');
+    $results->setFetchMode(PDO::FETCH_CLASS, 'MyClass');
 
-PHP will call this magic method for every non-existent property passing in its name and value.*/
+    PHP will call this magic method for every non-existent property passing in its name and value.*/
 
 
 

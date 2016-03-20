@@ -11,6 +11,9 @@ use Framework\Exception\BadResponseTypeException;
 use Framework\Exception\HttpNotFoundException;
 use Framework\Exception\AuthRequredException;
 use Framework\DI\Service;
+use Framework\Security\Security;
+use Framework\Session\Session;
+use Framework\Request\Request;
 
 class Application {
 
@@ -20,13 +23,16 @@ class Application {
      */
     public function __construct($config_path)
     {
-	    // echo 'Create APP with config: '. $config_path;
-		// Берём значения из конфига APP и часто используемые инициализируем как сервисы
+        // echo 'Create APP with config: '. $config_path;
+        // Берём значения из конфига APP и часто используемые инициализируем как сервисы
 
+        Service::set('security', new Security());
+        Service::set("session",new Session());
+        Service::set('request', new Request());
         $config = include_once $config_path;
 
-		// из значения 'routes' получаем путь к таблице маршрутов
-		// подгружаем роутер и инициализируем таблицу маршрутизации
+        // из значения 'routes' получаем путь к таблице маршрутов
+        // подгружаем роутер и инициализируем таблицу маршрутизации
         Service::set("router", new Router($config["routes"]));
         //Service::set('renderer', new Renderer($config["main_layout"]));
         // в renderer передадим весь конфиг, а там возьмем пути к view
@@ -45,47 +51,55 @@ class Application {
 
 
         //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
-		
-/*         Service::set('config', include($config_path));
-        Service::set('loader', 'Loader');
-        Service::set('request', 'Framework\Request\Request');
- */
+
+        /*         Service::set('config', include($config_path));
+                Service::set('loader', 'Loader');
+                Service::set('request', 'Framework\Request\Request');
+         */
     }
-	/**
-	 * Запуск роутера, запуск нужного контроллера, отдает респонс
-	 */	
+    /**
+     * Запуск роутера, запуск нужного контроллера, отдает респонс
+     */
     public function run(){
         // $router = new Router(include('../app/config/routes.php'));
-		$router = Service::get('router');
+        $router = Service::get('router');
         $route =  $router->parseRoute();
         // require_once('../src/Blog/Controller/PostController.php');
-       
+
         // echo "<pre>";
         // echo "ROUTE:  <br />" ;
         // print_r($route);
 
         try{
-        	if (!empty($route)){
+            if (!empty($route)){
                 $controller_class = $route["controller"];
-                // echo "<br> controller Class: " . $controller_class;
-                $action = $route['action'] . 'Action';
+                echo "<br> controller Class: " . $controller_class;
                 // echo "<br> with ACTION method: " .  $action ;
                 // echo "<br> ---------- <br>";
-                $controllerReflection = new \ReflectionClass($route['controller']);
+                //$controllerReflection = new \ReflectionClass($controller_class);
 
-				//$controller_class = $controller_class;
+                //echo "<br> controller Class: " . $route["controller"];
+                //$controllerReflection = new \ReflectionClass($route["controller"]);
+
+                //echo "<hr> Reflection: <br>";
+                //var_dump($controllerReflection);
+                //$controller_class = $route["controller"];
+                $action = $route['action'] . 'Action';
+                //$controller_class = $controller_class;
                 if (!class_exists($controller_class)) {
                     throw new \Exception("Controller '$controller_class' not found ");
                 } else {
-					// проверяем, задан ли метод название+Action
+                    // проверяем, задан ли метод название+Action
                     if (!method_exists($controller_class, $action)) {
                         throw new \Exception("Controller '$controller_class' has no method '$action' ");
                     } else {
                         // Создадим CONTROLLER через рефлексию класса, описанного в конфиге роута
-                        //$controllerReflection = new \ReflectionClass($controller_class);
-       		            $controller = $controllerReflection->newInstance();
-         		        // из задания в Action создаём новый экземпляр
-       		            $actionReflection = $controllerReflection->getMethod($action);
+                        $controllerReflection = new \ReflectionClass($controller_class);
+                        echo "<hr> Reflection: <br>";
+                        var_dump($controllerReflection);
+                        $controller = $controllerReflection->newInstance();
+                        // из задания в Action создаём новый экземпляр
+                        $actionReflection = $controllerReflection->getMethod($action);
                         // echo "<br>actionReflection: <br />";
                         // print_r($actionReflection);
                         //print_r($route['params']);
@@ -96,49 +110,49 @@ class Application {
                             //new Response('test');
                             $response = $actionReflection->invoke($controller);
                         } else {
-							//  с передачей аргументов
-     						// (Pоутер должен содержать массив 'params' взятый из URL)
+                            //  с передачей аргументов
+                            // (Pоутер должен содержать массив 'params' взятый из URL)
                             // print_r($route['params']);
                             $response = $actionReflection->invokeArgs($controller, $route['params']);
                         }
-       			        // $response = $actionReflection->invokeArgs($controller, $route['params']);
-                        echo "<br> +++Response: <br />";
-                        print_r($response);
+                        // $response = $actionReflection->invokeArgs($controller, $route['params']);
+                        echo "<HR> Response: <br />";
+                        var_dump($response);
                         // Если ответ пришел в виде класса - экземпляра экземпляра Response
-       			        if ($response instanceof Response){
+                        if ($response instanceof Response){
                             // Значит всё нормально - пришел правильный ответ
                             // echo "<br> +++Response: <br />";
                             // print_r($response);
 
-        		        } else {
-        		            throw new BadResponseTypeException('Ooops');
-        		        }
+                        } else {
+                            throw new BadResponseTypeException('Ooops');
+                        }
                     }
                 }
-         	} else {
-        		throw new HttpNotFoundException('Route not found');
-        	}
+            } else {
+                throw new HttpNotFoundException('Route not found');
+            }
         }catch(HttpNotFoundException $e){
             // Render 404 or just show msg
             // HttpNotFoundException покажет 404 ошибку
             echo $e->getMessage();
         }
         catch(AuthRequredException $e){
-        		echo 'Reroute to login page' ;
-        	// Reroute to login page
-        	//$response = new RedirectResponse(...);
+            echo 'Reroute to login page' ;
+            // Reroute to login page
+            //$response = new RedirectResponse(...);
             $e->getMessage();
         }
         catch(BadResponseException $e){
             echo $e->getMessage();
         }
         catch(\Exception $e){
-        	// Do 500 layout...
-        	echo $e->getMessage();
+            // Do 500 layout...
+            echo $e->getMessage();
         }
         $response->send();
-    }        
-         //echo '<pre>';
-         //echo 'Returned route: <BR>';
-         //print_r($route);
+    }
+    //echo '<pre>';
+    //echo 'Returned route: <BR>';
+    //print_r($route);
 }
