@@ -38,11 +38,10 @@ class Controller {
      * @return  Response
      */
     public function render($Layout, $Data = array()){
-        echo '<BR>CONTROLLER renderer input layout: '. $Layout;
-        echo '<HR>DATA:<BR>';
-        echo var_dump($Data);
         $class = get_called_class();
         //new Response("test");
+        echo '<hr>CONTROLLER renderer input layout: <B>'. $Layout .'</B> from class: '.$class.' with DATA array:<BR>';
+        echo var_dump($Data);
         $ControllerName = str_replace('Controller','',basename(str_replace('\\', DIRECTORY_SEPARATOR, $class)));
         // Renderer-у нужно передать полный путь к шаблону
         // Возьмем его из названия модели ($Layout)
@@ -52,8 +51,8 @@ class Controller {
         //$renderer = new Renderer('...'); // Try to define renderer like a service. e.g.: Service::get('renderer');
         //$content = $renderer->render($fullpath, $data);
         $content = Service::get('renderer')->render($ControllerName."/".$Layout.".php",$Data);
-        echo '<HR>**********Content:**********<BR>';
-        echo $content;
+        //echo '<HR><B>Content:</B><BR>';
+        //echo $content;
         return  new Response($content);
     }
 

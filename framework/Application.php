@@ -48,7 +48,7 @@ class Application {
         }catch(\PDOException $e){
             echo $e->getMessage();die();
         }
-
+        Service::set('app', $this);
 
         //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
 
@@ -61,78 +61,93 @@ class Application {
      * Запуск роутера, запуск нужного контроллера, отдает респонс
      */
     public function run(){
-        // $router = new Router(include('../app/config/routes.php'));
         $router = Service::get('router');
         $route =  $router->parseRoute();
-        // require_once('../src/Blog/Controller/PostController.php');
-
-        // echo "<pre>";
-        // echo "ROUTE:  <br />" ;
+        // echo "<pre>ROUTE:  <br />";
         // print_r($route);
+        if (!empty($route)) {
+            // Нашли маршрут, подготовимся к запуску контроллера
+            // $controller_class = $route["controller"];
+            // $action = $route['action'];
+            // в роутере мы должны были создать массив с параметрами
+            return $this->startController($route["controller"], $route['action'], $route['params']);
+        }
+    }
+    //echo '<pre>';
+    //echo 'Returned route: <BR>';
+    //print_r($route);
 
-        try{
-            if (!empty($route)){
-                $controller_class = $route["controller"];
-                echo "<br> controller Class: " . $controller_class;
-                // echo "<br> with ACTION method: " .  $action ;
-                // echo "<br> ---------- <br>";
-                //$controllerReflection = new \ReflectionClass($controller_class);
-
-                //echo "<br> controller Class: " . $route["controller"];
-                //$controllerReflection = new \ReflectionClass($route["controller"]);
-
-                //echo "<hr> Reflection: <br>";
-                //var_dump($controllerReflection);
-                //$controller_class = $route["controller"];
-                $action = $route['action'] . 'Action';
-                //$controller_class = $controller_class;
-                if (!class_exists($controller_class)) {
-                    throw new \Exception("Controller '$controller_class' not found ");
+    /**
+     * По заданному контроллеру выполняем метод action с параметрами, переданными через массив.
+     *
+     * @param string $controller_name
+     * @param string $action
+     * @param array $data
+     *
+     * @return Response|null
+     * @throws \Exception If obtained controller is not subclass of Controller class
+     */
+    /**
+     * Method starts necessary method of necessary controller with help of Reflection
+     *
+     * @param string $controller_name
+     * @param string $action
+     * @param array $data
+     * @throws HttpNotFoundException
+     * @throws \Exception
+     *
+     * @return object
+     */
+    public function startController($controller_name, $action, Array $data = []) {
+        try {
+            if (!class_exists($controller_name)) {
+                throw new \Exception("Controller '$controller_name' not found ");
+            } else {
+                // проверяем, задан ли метод название+Action
+                $action = $action . 'Action';
+                if (!method_exists($controller_name, $action)) {
+                    throw new \Exception("Controller '$controller_name' has no method '$action' ");
                 } else {
-                    // проверяем, задан ли метод название+Action
-                    if (!method_exists($controller_class, $action)) {
-                        throw new \Exception("Controller '$controller_class' has no method '$action' ");
-                    } else {
-                        // Создадим CONTROLLER через рефлексию класса, описанного в конфиге роута
-                        $controllerReflection = new \ReflectionClass($controller_class);
-                        echo "<hr> Reflection: <br>";
-                        var_dump($controllerReflection);
-                        $controller = $controllerReflection->newInstance();
-                        // из задания в Action создаём новый экземпляр
-                        $actionReflection = $controllerReflection->getMethod($action);
-                        // echo "<br>actionReflection: <br />";
-                        // print_r($actionReflection);
-                        //print_r($route['params']);
-                        $params = $actionReflection->getParameters();
-                        //Вызов метода (кот. описан в Action)
-                        if(empty($params)) {
-                            echo "<br> NO PARAMETERS on '$actionReflection' <br />";
-                            //new Response('test');
-                            $response = $actionReflection->invoke($controller);
-                        } else {
-                            //  с передачей аргументов
-                            // (Pоутер должен содержать массив 'params' взятый из URL)
-                            // print_r($route['params']);
-                            $response = $actionReflection->invokeArgs($controller, $route['params']);
-                        }
-                        // $response = $actionReflection->invokeArgs($controller, $route['params']);
-                        echo "<HR> Response: <br />";
-                        var_dump($response);
-                        // Если ответ пришел в виде класса - экземпляра экземпляра Response
-                        if ($response instanceof Response){
-                            // Значит всё нормально - пришел правильный ответ
-                            // echo "<br> +++Response: <br />";
-                            // print_r($response);
+                    // Создадим экземпляр CONTROLLER через рефлексию класса
+                    $controllerReflection = new \ReflectionClass($controller_name);
+                    echo "<hr> Reflection: <br>";
+                    var_dump($controllerReflection);
+                    $controller = $controllerReflection->newInstance();
+                    // из задания в Action создаём новый экземпляр
 
-                        } else {
-                            throw new BadResponseTypeException('Ooops');
-                        }
+                    $actionReflection = $controllerReflection->getMethod($action);
+                    // echo "<br>actionReflection: <br />";
+                    // print_r($actionReflection);
+                    //print_r($route['params']);
+                    $params = $actionReflection->getParameters();
+                    //Вызов метода (кот. описан в Action)
+                    if(empty($params)) {
+                        echo "<br> NO PARAMETERS on '$actionReflection' <br />";
+                        //new Response('test');
+                        $response = $actionReflection->invoke($controller);
+                    } else {
+                        //  с передачей аргументов
+                        // (Pоутер должен содержать массив 'params' взятый из URL)
+                        // print_r($route['params']);
+                        $response = $actionReflection->invokeArgs($controller, $data);
+                    }
+                    // $response = $actionReflection->invokeArgs($controller, $route['params']);
+                    echo "<HR> Response: <br />";
+                    var_dump($response);
+                    // Если ответ пришел в виде класса - экземпляра экземпляра Response
+                    if ($response instanceof Response){
+                        // Значит всё нормально - пришел правильный ответ
+                        // echo "<br> +++Response: <br />";
+                        // print_r($response);
+
+                    } else {
+                        throw new BadResponseTypeException('Ooops');
                     }
                 }
-            } else {
-                throw new HttpNotFoundException('Route not found');
             }
-        }catch(HttpNotFoundException $e){
+
+        }
+        catch(HttpNotFoundException $e){
             // Render 404 or just show msg
             // HttpNotFoundException покажет 404 ошибку
             echo $e->getMessage();
@@ -152,7 +167,72 @@ class Application {
         }
         $response->send();
     }
-    //echo '<pre>';
-    //echo 'Returned route: <BR>';
-    //print_r($route);
+
+    public function startController2($controller, $action, $vars=array()){
+
+        $controller = new $controller;
+        $action = $action.'Action';
+
+        $refl = new \ReflectionClass($controller);
+        try{
+            if ($refl->hasMethod($action)) {
+                $method = new \ReflectionMethod($controller, $action);
+                $params = $method->getParameters();
+
+
+                if (empty($params)) {
+                    $response = $method->invoke(new $controller);
+                }else{
+                    foreach ($params as $value){
+                        if (isset($vars[$value->getName()])) {
+                            $parameters[$value->getName()] = $vars[$value->getName()];
+                        }else{
+                            throw new HttpNotFoundException('parameters for method '.$method->getName());
+                        }
+
+                    }
+                    $response = $method->invokeArgs(new $controller, $parameters);
+                }
+
+
+                if ($response instanceof AResponse){
+                    return $response;
+
+                }else{
+                    throw new ServerErrorException(500, 'Sory, server error', $this->config['error_500']);
+                }
+
+            }else{
+                throw new HttpNotFoundException('method not found');
+            }
+        }catch (HttpNotFoundException $e){
+            throw $e;
+        }catch(ServerErrorException $e){
+            $renderer = new Renderer($e->layout, array('message'=>$e->message, 'code'=>$e->code));
+            $response = new Response($renderer->render());
+            $response->send();
+            die();
+        }
+    }
+
+    public function getActionResponse($controller_name, $action, Array $data = [])
+    {
+        $action .= 'Action';
+
+        $controllerReflection = new \ReflectionClass($controller_name);
+
+        if (!$controllerReflection->isSubclassOf('Framework\Controller\Controller')) {
+            throw new \Exception("Unknown controller " . $controllerReflection->name);
+        }
+
+        if ($controllerReflection->hasMethod($action)) {
+            // ReflectionMethod::invokeArgs() has been overloaded in class ReflectionMethodNamedArgs
+            // Now it provides controller action invoking with named arguments
+            $actionReflection = new ReflectionMethodNamedArgs($controller_name, $action);
+            $controller = $controllerReflection->newInstance();
+            $response = $actionReflection->invokeArgs($controller, $data);
+            return $response;
+        }
+        return null;
+    }
 }

@@ -55,8 +55,7 @@ abstract class ActiveRecord {
             $query = $db->query($querystring);
             $check_query_result = $query;
         }
-        echo '<BR>ActiveRecord find with mode '. $mode . ' TABLE: ' . $table;
-        echo '<BR>querystring= '.$querystring;
+        //echo '<BR>ActiveRecord find with mode '. $mode . ' TABLE: ' . $table.'<BR>querystring= '.$querystring;
         // PDO request...
         // $result = array();
         // $sql = $db->prepare($query);

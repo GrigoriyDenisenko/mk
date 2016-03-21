@@ -55,7 +55,7 @@ class Loader{
      */
 
     public static function load($className){
-        echo "<hr>load ".$className."<BR>";
+        //echo "<hr>load ".$className."<BR>";
 
         $namespaceName = strtok($className, "\\");
         //echo "namespaceName= " . $namespaceName;
@@ -66,7 +66,7 @@ class Loader{
             $path = str_replace("\\", DIRECTORY_SEPARATOR, $namespacePath . str_replace($namespaceName, "", $className)) . ".php";
             if (file_exists($path)) {
                 //echo '<pre>';
-                echo "include_once " . $path;
+                // echo "include_once " . $path;
                 include_once($path);
             }else{
                 echo "file " . $path." not exist!!!!!!!!!!!!!";

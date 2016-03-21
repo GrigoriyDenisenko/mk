@@ -34,7 +34,7 @@ class Renderer {
             $this->main_template = $main_template_file;
             $this->error_template = $error_template_file;
             $this->templates_dir=dirname($main_template_file)."/";
-            echo "<BR>main_template_file is set to: ".$main_template_file ;
+            // echo "<BR>main_template_file is set to: ".$main_template_file ;
         }else{
             echo "Template NOT FOUND <BR>";
             var_dump($config);
@@ -73,21 +73,19 @@ class Renderer {
      * @return  text/html
      */
     public function render($template_path, $data = array(), $wrap = true){
-        echo "<BR>Renderer->render: ";
 
         if (!file_exists($template_path)){
             $template_path=$this->templates_dir . $template_path;
-
         }
 
-        echo "<BR>Template: ". $template_path;
+        //echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
+        //var_dump($data);
 
-        $include = function($controller, $action, $args = array()) {
-            $controllerInstance = new $controller();
-            if ($args === null) {
-                $args = array();
-            }
-            return call_user_func_array(array($controllerInstance, $action.'Action'), $args);
+        // Подготовим функции, кот. вызываются из пользовательских шаблонов
+
+        $include = function($controller_name, $action, Array $data = []) {
+            //echo "<hr> include function from temlate file with controller name: ". $controller_name;
+            return Service::get('app')->startController($controller_name, $action, $data);
         };
 
         $generateToken = function(){
@@ -97,10 +95,7 @@ class Renderer {
         };
 
         $getRoute = function($name){
-            if( array_key_exists( $name, Service::get('routes'))) {
-                $uri = Service::get('routes')[$name]['pattern'];
-                echo $uri;
-            }
+            return Service::get('router')->buildRoute($name);
         };
 
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
@@ -118,7 +113,7 @@ class Renderer {
 
         if($wrap){
             // наш шаблон находится внутри главного шаблона
-            echo "<HR>WRAP<BR>";
+            //echo "<HR>WRAP<BR>";
             $content = $this->renderMain($content);
         }
 
