@@ -17,11 +17,11 @@ class Session {
     }
 
     public function __set($name, $val){
-
+        $_SESSION[$name] = $val;
     }
 
     public function __get($name){
-
+        return array_key_exists($name, $_SESSION) ? $_SESSION[$name] : null;
     }
 
     public function addFlash($type, $message){

@@ -73,23 +73,23 @@ class Controller {
     }
 
     /**
-     * Get Request
-     *
-     * @return Request
+     * Метод возвращает реквест
+     * @return Request реквест
      */
 
     public function getRequest() {
-        return new Request();
+        return Service::get('request');
     }
-    /**
-     * Generate route for redirect or etc.
-     *
-     * @param $name
-     * @return mixed
-     */
 
-    public function generateRoute( $name ) {
-        return Service::get(['routes'])[$name]['pattern'];
+    /**
+     * Возвращает путь по заданному имени роута и параметрам
+     * @param string $route_name имя роута как в конфиге
+     * @param array $params необязательный параметр - ассоциативный массив в формате имя переменной => значение
+     * @return string uri согласно паттерну заданного роута с учетом значений параметров. Если роут не найден - вернется значение /
+     */
+    public function generateRoute($route_name, $params = array())
+    {
+        return Service::get("router")->buildRoute($route_name, $params);
     }
 
 }

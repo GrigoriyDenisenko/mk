@@ -49,13 +49,6 @@ class Application {
             echo $e->getMessage();die();
         }
         Service::set('app', $this);
-
-        //Service::set('renderer', ObjectPool::get('Framework\Renderer\Renderer', Service::get('config')));
-
-        /*         Service::set('config', include($config_path));
-                Service::set('loader', 'Loader');
-                Service::set('request', 'Framework\Request\Request');
-         */
     }
     /**
      * Запуск роутера, запуск нужного контроллера, отдает респонс
@@ -69,13 +62,11 @@ class Application {
             // Нашли маршрут, подготовимся к запуску контроллера
             // $controller_class = $route["controller"];
             // $action = $route['action'];
-            // в роутере мы должны были создать массив с параметрами
+            // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
+            // print_r($route['params']);
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }
     }
-    //echo '<pre>';
-    //echo 'Returned route: <BR>';
-    //print_r($route);
 
     /**
      * По заданному контроллеру выполняем метод action с параметрами, переданными через массив.
@@ -113,8 +104,6 @@ class Application {
                     echo "<hr> Reflection: <br>";
                     var_dump($controllerReflection);
                     $controller = $controllerReflection->newInstance();
-                    // из задания в Action создаём новый экземпляр
-
                     $actionReflection = $controllerReflection->getMethod($action);
                     // echo "<br>actionReflection: <br />";
                     // print_r($actionReflection);
@@ -127,11 +116,9 @@ class Application {
                         $response = $actionReflection->invoke($controller);
                     } else {
                         //  с передачей аргументов
-                        // (Pоутер должен содержать массив 'params' взятый из URL)
-                        // print_r($route['params']);
                         $response = $actionReflection->invokeArgs($controller, $data);
+                        // $response = $actionReflection->invokeArgs($controller, $route['params']);
                     }
-                    // $response = $actionReflection->invokeArgs($controller, $route['params']);
                     echo "<HR> Response: <br />";
                     var_dump($response);
                     // Если ответ пришел в виде класса - экземпляра экземпляра Response

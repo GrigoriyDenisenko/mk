@@ -9,39 +9,46 @@ namespace Framework\Request;
 class Request
 {
     /**
-     * Check request method
+     * Проверить, является ли запрос, POST запросом
      *
      * @return bool
      */
     public function isPost()
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            return true;
-        } else {
-            return false;
-        }
+        return $_SERVER["REQUEST_METHOD"] == "POST";
     }
 
     /**
-     * Returns parameter from $_POST
+     * Проверить, является ли запрос, GET запросом
      *
-     * @param string $param
-     * @return string
+     * @return bool
      */
-    public function post($param)
+    public function isGet()
     {
-        //@TODO Add filtration
-        return $_POST[$param];
+        return $_SERVER["REQUEST_METHOD"] == "GET";
     }
 
     /**
-     * Returns parameter from $_GET
-     *
-     * @param string $param
-     * @return string
+     * Возвращает значение переменной POST запроса по ключу
+     * @param $name string ключ
+     * @return mixed значение переменной
      */
-    public function get($param)
+    public function post($name)
     {
-        return $_GET[$param];
+        echo "<hr>search string: ". $name;
+        echo "<br>in post array:";
+        var_dump($_POST);
+        return (array_key_exists($name, $_POST)) ? htmlspecialchars($_POST[$name]) : null;
     }
+
+    /**
+     * Возвращает значение переменной GET запроса по ключу
+     * @param $name string ключ
+     * @return mixed значение переменной
+     */
+    public function get($name)
+    {
+        return (array_key_exists($name, $_GET)) ? htmlspecialchars($_GET[$name]) : null;
+    }
+
 }

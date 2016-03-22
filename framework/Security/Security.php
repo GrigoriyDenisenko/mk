@@ -12,10 +12,14 @@ class Security{
 
 
     public function setUser($user){
-        Service::get('session')->addToSess('user', $user);
+        echo "<hr>user: ".$user;
+
+        Service::get('session')->set('user', $user);
     }
 
     public function isAuthenticated(){
+        echo "<HR>Session:";
+        var_dump($_SESSION);
         return !empty($_SESSION['user']);
     }
 
@@ -29,7 +33,7 @@ class Security{
         }else{
             $token = md5(Service::get('session')->getSessID());
             setcookie('token', $token);
-            Service::get('session')->addToSess('token', $token);
+            Service::get('session')->set('token', $token);
         }
     }
 
