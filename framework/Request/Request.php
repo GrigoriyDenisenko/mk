@@ -30,15 +30,47 @@ class Request
 
     /**
      * Возвращает значение переменной POST запроса по ключу
-     * @param $name string ключ
+     * @param $varname string ключ
+     * @param $filter_name string формат фильтра для filter_var функции
      * @return mixed значение переменной
      */
-    public function post($name)
+    public function post($varname = '', $filter_name = 'STRING')
     {
-        echo "<hr>search string: ". $name;
+        echo "<hr>search string: ". $varname;
         echo "<br>in post array:";
         var_dump($_POST);
-        return (array_key_exists($name, $_POST)) ? htmlspecialchars($_POST[$name]) : null;
+        if ($varname == 'password') {
+            return array_key_exists($varname, $_POST) ? md5($this->filter($_POST[$varname], $filter_name)) : null;
+        }
+        return array_key_exists($varname, $_POST) ? $this->filter($_POST[$varname], $filter_name) : null;
+    }
+
+    /**
+     * Filter obtained value
+     *
+     * @param mixed $source
+     * @param string $filter_name
+     * @return mixed|null
+     */
+    public function filter($source, $filter_name = 'STRING')
+    {
+        $result = null;
+
+        switch ($filter_name) {
+            case 'STRING':
+                $result = filter_var((string)$source, FILTER_SANITIZE_STRING);
+                break;
+            case 'EMAIL':
+                $result = filter_var((string)$source, FILTER_SANITIZE_EMAIL);
+                break;
+            case 'INT': // Only use the first integer value
+                preg_match('~^\d+~', (string)$source, $matches);
+                $result = (int)$matches[0];
+                break;
+        }
+
+        return $result;
+
     }
 
     /**

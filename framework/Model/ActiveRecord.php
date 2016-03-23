@@ -27,11 +27,12 @@ abstract class ActiveRecord {
     public abstract static function getTable();
 
     /**
-     *  @param $mode
+     * @param mixed $mode
+     * @param mixed|null $value значение, кот. нужно выбрать из поля заданного в параметре
      * Получить 1 запись, если задан идентификатор ($mode) записи
      * а иначе все записи - $mode = 'all'
      */
-    public static function find($mode = 'all'){
+    public static function find($mode = 'all', $value = null){
 
         $table = static::getTable();
 
@@ -85,8 +86,8 @@ abstract class ActiveRecord {
         $result=$query->fetchAll(\PDO::FETCH_CLASS, get_called_class());
         // get_called_class - должен сам заполнить поля класса, созданного на базе нашего ActiveRecord
         //
-        echo '<BR>RESULT from table "'.$table.'":<BR>';
-        var_dump($result);
+        //echo '<BR>RESULT from table "'.$table.'":<BR>';
+        //var_dump($result);
 
         if ($mode === 'all') {
             // возвращаем весь список
@@ -109,8 +110,8 @@ abstract class ActiveRecord {
      */
     static public function findByEmail($email)
     {
-        echo '<hr>findByEmail: ';
-        var_dump($email);
+        //echo '<hr>findByEmail: ';
+        //var_dump($email);
         return static::find('email', (string)$email);
     }
 
@@ -147,6 +148,15 @@ abstract class ActiveRecord {
         }*/
 
         $table = static::getTable();
+        if($table == 'users')
+        {
+            //echo "<hr>save to user_email: ".$fields['email'];
+            //var_dump($fields);
+
+            if (!empty(static::findByEmail($fields['email']))){
+                throw new DatabaseException('This E-mail already exist');
+            }
+        }
         $db = Service::get('db');
 
         $sth = $db->prepare('SHOW COLUMNS FROM '.$table);
