@@ -33,7 +33,7 @@ class Router{
         $url = empty($url) ? $_SERVER['REQUEST_URI'] : $url;
 
         $route_found = null;
-        // echo "<hr>parse Url: <B>".$url.'</B><br />';
+        //echo "<hr>parse Url: <B>".$url.'</B><br />';
         $url=preg_replace('~^\\/index.php$~i', '/', $url);
 
         foreach(self::$map as $route){
@@ -92,12 +92,12 @@ class Router{
         $routes = self::$map[$route_name];
         //$this->getRoutesByNames(array($route_name));
         if (empty($routes)) {
-            //throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $route_name));
+            // throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $route_name));
             // echo sprintf('Route "%s" does not exist.', $route_name);
             return '';
         }
-        // echo 'From ROUTE:<br />';
-        // print_r($routes);
+        //echo 'From ROUTE:<br />';
+        //var_dump($routes);
         $url='';
 
         if ($routes['_requirements']) {

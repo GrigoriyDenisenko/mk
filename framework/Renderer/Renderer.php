@@ -36,11 +36,9 @@ class Renderer {
             $this->templates_dir=dirname($main_template_file)."/";
             // echo "<BR>main_template_file is set to: ".$main_template_file ;
         }else{
-            echo "Template NOT FOUND <BR>";
-            var_dump($config);
-
-            //$dir = Service::get('session')->get('path_to_view');
-            //$this->layout = '../src/Blog/views/'.$dir.'/'.$layout.'.php';
+            // echo "Template NOT FOUND <BR>";
+            // var_dump($config);
+            throw new \Exception('File ' . $main_template_file . ' not found');
         }
     }
 
@@ -52,8 +50,7 @@ class Renderer {
      * @return html/text
      */
     public function renderMain($content){
-        echo "<BR>RendererMain<BR> ";
-
+        // echo "<BR>RendererMain<BR> ";
         $flush = [];
         $user = Service::get('security')->getUser();
 
@@ -119,4 +116,16 @@ class Renderer {
 
         return $content;
     }
+
+    /**
+     * рендерим страницу ошибки
+     *
+     * @param array $data
+     *
+     * $error_template_file
+     */
+    public function renderError($data = array()){
+        return $this->render($this->error_template,$data);
+    }
+
 }

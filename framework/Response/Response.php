@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: K.Gritsenko
- * Date: 18.02.2016
- * Time: 17:08
- */
 
 namespace Framework\Response;
 
@@ -15,10 +9,13 @@ namespace Framework\Response;
  */
 class Response
 {
+    private $content;
+    private $code;
+    private $type;
     /**
      * @var array $_headers An array of response headers
      */
-    protected $_headers = [];
+    private $_headers = [];
 
     /**
      * @var array $_msgs An array of status codes and messages
@@ -97,7 +94,7 @@ class Response
         $this->content = $content;
         $this->code = $code;
         $this->type = $type;
-        echo "<BR>----------------------CREATE RESPONSE<BR>";
+        echo '<hr>CREATE RESPONSE with code: ' . $code;
         $this->setHeader('Content-Type', $this->type);
     }
 
@@ -126,4 +123,14 @@ class Response
     {
         echo $this->content;
     }
+
+    /**
+     * Возврашает тип контента текущего респонса
+     * @return string тип контента
+     */
+    public function getContentType()
+    {
+        return $this->type;
+    }
+
 }

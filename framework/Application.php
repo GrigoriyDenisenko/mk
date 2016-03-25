@@ -57,7 +57,7 @@ class Application {
         $router = Service::get('router');
         $route =  $router->parseRoute();
         // echo "<pre>ROUTE:  <br />";
-        // print_r($route);
+        // var_dump($route);
         if (!empty($route)) {
             // Нашли маршрут, подготовимся к запуску контроллера
             // $controller_class = $route["controller"];
@@ -65,6 +65,8 @@ class Application {
             // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
             // print_r($route['params']);
             return $this->startController($route["controller"], $route['action'], $route['params']);
+        }else{
+            echo $_SERVER['REQUEST_URI'] . ' not found';
         }
     }
 
@@ -111,15 +113,15 @@ class Application {
                     $params = $actionReflection->getParameters();
                     //Вызов метода (кот. описан в Action)
                     if(empty($params)) {
-                        echo "<br> NO PARAMETERS on '$actionReflection' <br />";
-                        //new Response('test');
+                        // echo "<br> NO PARAMETERS on '$actionReflection' <br />";
+                        // new Response('test');
                         $response = $actionReflection->invoke($controller);
                     } else {
                         //  с передачей аргументов
                         $response = $actionReflection->invokeArgs($controller, $data);
                         // $response = $actionReflection->invokeArgs($controller, $route['params']);
                     }
-                    echo "<HR> Response: <br />";
+                    echo "<HR>Response from: " . $actionReflection;
                     var_dump($response);
                     // Если ответ пришел в виде класса - экземпляра экземпляра Response
                     if ($response instanceof Response){
@@ -134,72 +136,28 @@ class Application {
             }
 
         }
-        catch(HttpNotFoundException $e){
+        //catch(HttpNotFoundException $e){
             // Render 404 or just show msg
             // HttpNotFoundException покажет 404 ошибку
-            echo $e->getMessage();
-        }
-        catch(AuthRequredException $e){
-            echo 'Reroute to login page' ;
+            //echo $e->getMessage();
+        //}
+        //catch(AuthRequredException $e){
+            //echo 'Reroute to login page' ;
             // Reroute to login page
             //$response = new RedirectResponse(...);
-            $e->getMessage();
-        }
-        catch(BadResponseException $e){
-            echo $e->getMessage();
-        }
+            //$e->getMessage();
+        //}
+        //catch(BadResponseException $e){
+            //echo $e->getMessage();
+        //}
         catch(\Exception $e){
             // Do 500 layout...
             echo $e->getMessage();
+            //$renderer = new Renderer($e->layout, array('message'=>$e->message, 'code'=>$e->code));
+            //$response = new Response($renderer->render());
+            $response = new Response(Service::get('renderer')->renderError($e), $e->getCode());
         }
         $response->send();
-    }
-
-    public function startController2($controller, $action, $vars=array()){
-
-        $controller = new $controller;
-        $action = $action.'Action';
-
-        $refl = new \ReflectionClass($controller);
-        try{
-            if ($refl->hasMethod($action)) {
-                $method = new \ReflectionMethod($controller, $action);
-                $params = $method->getParameters();
-
-
-                if (empty($params)) {
-                    $response = $method->invoke(new $controller);
-                }else{
-                    foreach ($params as $value){
-                        if (isset($vars[$value->getName()])) {
-                            $parameters[$value->getName()] = $vars[$value->getName()];
-                        }else{
-                            throw new HttpNotFoundException('parameters for method '.$method->getName());
-                        }
-
-                    }
-                    $response = $method->invokeArgs(new $controller, $parameters);
-                }
-
-
-                if ($response instanceof AResponse){
-                    return $response;
-
-                }else{
-                    throw new ServerErrorException(500, 'Sory, server error', $this->config['error_500']);
-                }
-
-            }else{
-                throw new HttpNotFoundException('method not found');
-            }
-        }catch (HttpNotFoundException $e){
-            throw $e;
-        }catch(ServerErrorException $e){
-            $renderer = new Renderer($e->layout, array('message'=>$e->message, 'code'=>$e->code));
-            $response = new Response($renderer->render());
-            $response->send();
-            die();
-        }
     }
 
     public function getActionResponse($controller_name, $action, Array $data = [])
