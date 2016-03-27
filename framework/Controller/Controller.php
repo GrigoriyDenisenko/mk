@@ -40,8 +40,8 @@ class Controller {
     public function render($Layout, $Data = array()){
         $class = get_called_class();
         //new Response("test");
-        echo '<hr>CONTROLLER renderer input layout: <B>'. $Layout .'</B> from class: '.$class.' with DATA array:<BR>';
-        echo var_dump($Data);
+        //echo '<hr>CONTROLLER renderer input layout: <B>'. $Layout .'</B> from class: '.$class.' with DATA array:<BR>';
+        //echo var_dump($Data);
         $ControllerName = str_replace('Controller','',basename(str_replace('\\', DIRECTORY_SEPARATOR, $class)));
         // Renderer-у нужно передать полный путь к шаблону
         // Возьмем его из названия модели ($Layout)
@@ -57,19 +57,28 @@ class Controller {
     }
 
     /**
-     * Redirect
-     *
-     * @param $uri
-     * @param string $message
-     * @return ResponseRedirect
+     * Метод выполняет редирект по заданному адресу с заданным сообщением
+     * @param string $uri для редиректа
+     * @param string $message сообщение редиректа (будет отправлено как GET пара
+     * @return ResponseRedirect респонс-редирект на заданный uri с заданным сооб
      */
-
-    public function redirect( $uri, $message = '' ) {
-        if( empty( $uri )) {
+    /**
+     * Redirect to specified URL via a Location header.
+     *
+     * @param   string $url The URL to redirect
+     * @param   string|null $message The message for flush if any
+     * @param   int $code The redirect status code
+     *
+     * @return  ResponseRedirect
+     */
+    public function redirect($uri, $message = null, $code = 302)
+    {
+        if (empty($uri)) {
+            //throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
             $uri = '/';
         }
-
-        return new ResponseRedirect( $uri, $message );
+        if (isset($message)) Service::get('session')->setFlash('info', $message);
+        return new ResponseRedirect($uri, $code);
     }
 
     /**

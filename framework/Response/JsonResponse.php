@@ -18,7 +18,7 @@ class JsonResponse extends Response {
      * JsonResponse constructor.
      * @param string $array
      */
-    function __construct($array) {
+    function __construct($array, $code = 200, $type = 'application/json') {
         $this->content = $array;
     }
 

@@ -51,12 +51,14 @@ class Renderer {
      */
     public function renderMain($content){
         // echo "<BR>RendererMain<BR> ";
-        $flush = [];
+        $flush = Service::get('session')->getFlash();
         $user = Service::get('security')->getUser();
-
-        // рендерим страницу из главного шаблона, внутрь которого
-        // в переменную $content передаём ранее сгенерированный контент
         //$this->content = $content;
+        // рендерим страницу из главного шаблона, внутрь которого
+        // через ассоциативный массив передаём
+        // content - ранее сгенерированный контент
+        // user - параметры текущего пользователя
+        // flush - сессионные сообщения
         return $this->render($this->main_template, compact('content', 'user', 'flush'), false);
     }
 
@@ -125,6 +127,8 @@ class Renderer {
      * $error_template_file
      */
     public function renderError($data = array()){
+        echo "<hr>Err:";
+        var_dump($data);
         return $this->render($this->error_template,$data);
     }
 

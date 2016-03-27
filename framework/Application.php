@@ -9,7 +9,7 @@ use Framework\Response\Response;
 use Framework\Response\ResponseRedirect;
 use Framework\Exception\BadResponseTypeException;
 use Framework\Exception\HttpNotFoundException;
-use Framework\Exception\AuthRequredException;
+use Framework\Exception\NotAuthException;
 use Framework\DI\Service;
 use Framework\Security\Security;
 use Framework\Session\Session;
@@ -56,17 +56,24 @@ class Application {
     public function run(){
         $router = Service::get('router');
         $route =  $router->parseRoute();
-        // echo "<pre>ROUTE:  <br />";
-        // var_dump($route);
+        //echo "<pre>ROUTE:  <br />";
+        //var_dump($route);
         if (!empty($route)) {
             // Нашли маршрут, подготовимся к запуску контроллера
             // $controller_class = $route["controller"];
             // $action = $route['action'];
             // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
             // print_r($route['params']);
+            // контроллер запустился, запишем откуда стартовали
+            Service::get('session')->returnUrl = $route['pattern'];
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }else{
-            echo $_SERVER['REQUEST_URI'] . ' not found';
+            //throw new \Exception($_SERVER['REQUEST_URI'] . ' not found');
+            //$e = new HttpNotFoundException(ltrim($_SERVER['REQUEST_URI'],'/') . ' not found');
+            //$response = new Response(Service::get('renderer')->renderError($e));
+            //$response->send();
+            // пользователь преднамеренно зашел на отсутствующий url
+            echo ltrim($_SERVER['REQUEST_URI'],'/') . ' not found';
         }
     }
 
@@ -103,8 +110,8 @@ class Application {
                 } else {
                     // Создадим экземпляр CONTROLLER через рефлексию класса
                     $controllerReflection = new \ReflectionClass($controller_name);
-                    echo "<hr> Reflection: <br>";
-                    var_dump($controllerReflection);
+                    //echo "<hr> Reflection: <br>";
+                    //var_dump($controllerReflection);
                     $controller = $controllerReflection->newInstance();
                     $actionReflection = $controllerReflection->getMethod($action);
                     // echo "<br>actionReflection: <br />";
@@ -121,8 +128,8 @@ class Application {
                         $response = $actionReflection->invokeArgs($controller, $data);
                         // $response = $actionReflection->invokeArgs($controller, $route['params']);
                     }
-                    echo "<HR>Response from: " . $actionReflection;
-                    var_dump($response);
+                    //echo "<HR>Response from: " . $actionReflection;
+                    //var_dump($response);
                     // Если ответ пришел в виде класса - экземпляра экземпляра Response
                     if ($response instanceof Response){
                         // Значит всё нормально - пришел правильный ответ
@@ -136,20 +143,20 @@ class Application {
             }
 
         }
-        //catch(HttpNotFoundException $e){
+            //catch(HttpNotFoundException $e){
             // Render 404 or just show msg
             // HttpNotFoundException покажет 404 ошибку
             //echo $e->getMessage();
-        //}
-        //catch(AuthRequredException $e){
-            //echo 'Reroute to login page' ;
-            // Reroute to login page
-            //$response = new RedirectResponse(...);
-            //$e->getMessage();
-        //}
-        //catch(BadResponseException $e){
+            //}
+        catch(NotAuthException $e){
+            // Service::get('session')->set('returnUrl', Registry::getConfig('route')['pattern']);
+            // echo 'Reroute to login page';
+            // $e->getMessage();
+            $response = new ResponseRedirect(Service::get('router')->buildRoute('login'));
+        }
+            //catch(BadResponseException $e){
             //echo $e->getMessage();
-        //}
+            //}
         catch(\Exception $e){
             // Do 500 layout...
             echo $e->getMessage();
