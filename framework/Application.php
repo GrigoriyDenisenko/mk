@@ -65,7 +65,10 @@ class Application {
             // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
             // print_r($route['params']);
             // контроллер запустился, запишем откуда стартовали
-            Service::get('session')->returnUrl = $route['pattern'];
+            if ($user = Service::get('security')->getUser()) {  // Check the user role on the basis of user data stored in session
+                $user_role = is_object($user) ? $user->getRole() : $user['role'];
+            }
+            //Service::get('session')->returnUrl = $route['pattern'];
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }else{
             //throw new \Exception($_SERVER['REQUEST_URI'] . ' not found');

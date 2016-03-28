@@ -77,7 +77,12 @@ class Controller {
             //throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
             $uri = '/';
         }
-        if (isset($message)) Service::get('session')->setFlash('info', $message);
+        echo "<HR>redirect to: ".$uri." with message:";
+        var_dump($message);
+
+        if (isset($message)) Service::get('session')->addFlash('info', $message);
+
+        //return;
         return new ResponseRedirect($uri, $code);
     }
 

@@ -50,9 +50,11 @@ class Renderer {
      * @return html/text
      */
     public function renderMain($content){
-        // echo "<BR>RendererMain<BR> ";
+        //echo "<BR>RendererMain<BR> ";
         $flush = Service::get('session')->getFlash();
         $user = Service::get('security')->getUser();
+        //echo "Get USER: ";
+        //var_dump($user);
         //$this->content = $content;
         // рендерим страницу из главного шаблона, внутрь которого
         // через ассоциативный массив передаём

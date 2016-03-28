@@ -17,8 +17,8 @@ class Security{
      * @return bool
      */
     public function isAuthenticated(){
-        echo "<HR>Checks session if the user is authorized:";
-        var_dump($_SESSION);
+        //echo "<HR>Checks session if the user is authorized:";
+        //var_dump($_SESSION);
         return !empty($_SESSION['user']);
     }
 
@@ -43,19 +43,20 @@ class Security{
      *
      */
     public function setUser($user){
-        echo "<hr>user: ";
-        var_dump($user);
+        //echo "<hr>user: ";
+        //var_dump($user);
         // $user - передаётся как объект, поэтому для записи в сессию нам нужно его
         // сериализовать или взять те поля, кот. нужно хранить в сессии
         Service::get('session')->user = serialize($user);
         // чере __set: $_SESSION['is_authenticated'] = true
         Service::get('session')->isAuthenticated=true;
-        echo "<hr>yes login: ";
+        //echo "<hr>yes login: ";
         //echo Service::get('session')->isAuthenticated;
     }
 
-    public function getUser( $userSessionName = 'user' ) {
-        return isset( $_SESSION[$userSessionName] ) ? $_SESSION[$userSessionName] : null;
+    public function getUser() {
+        // разворачиваем из сессии объект $user
+        return isset( $_SESSION['user'] ) ? unserialize($_SESSION['user']) : null;
     }
 
     public function checkToken(){

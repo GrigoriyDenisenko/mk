@@ -94,7 +94,7 @@ class Response
         $this->content = $content;
         $this->code = $code;
         $this->type = $type;
-        echo '<hr>CREATE RESPONSE with code: ' . $code;
+        //echo '<hr>CREATE RESPONSE with code: ' . $code;
         $this->setHeader('Content-Type', $this->type);
     }
 
