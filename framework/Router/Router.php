@@ -1,5 +1,8 @@
 <?php
 namespace Framework\Router;
+
+use Framework\DI\Service;
+
 /**
  * Router.php
  */
@@ -30,7 +33,8 @@ class Router{
      */
     public function parseRoute($url = ''){
 
-        $url = empty($url) ? $_SERVER['REQUEST_URI'] : $url;
+        //$url = empty($url) ? getUri$_SERVER['REQUEST_URI'] : $url;
+        $url = empty($url) ? Service::get('request')->getUri() : $url;
 
         $route_found = null;
         //echo "<hr>parse Url: <B>".$url.'</B><br />';

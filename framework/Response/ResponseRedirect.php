@@ -24,7 +24,7 @@ class ResponseRedirect extends Response
             Service::get("session")->flush=$message;
         }*/
         // можно через абстрактный класс ResponseType::MOVED_PERMANENTLY (="301")
-        parent::__construct('', 302);
+        parent::__construct('', 301);
         parent::setHeader('Location', $url);
     }
 }

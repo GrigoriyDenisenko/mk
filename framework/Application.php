@@ -9,7 +9,7 @@ use Framework\Response\Response;
 use Framework\Response\ResponseRedirect;
 use Framework\Exception\BadResponseTypeException;
 use Framework\Exception\HttpNotFoundException;
-use Framework\Exception\NotAuthException;
+use Framework\Exception\SecurityException;
 use Framework\DI\Service;
 use Framework\Security\Security;
 use Framework\Session\Session;
@@ -65,10 +65,22 @@ class Application {
             // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
             // print_r($route['params']);
             // контроллер запустился, запишем откуда стартовали
-            if ($user = Service::get('security')->getUser()) {  // Check the user role on the basis of user data stored in session
-                $user_role = is_object($user) ? $user->getRole() : $user['role'];
+            if (!empty($route['security'])) {//check authorization on security pages
+                if ($user = Service::get('security')->getUser()) {  // Check the user role on the basis of user data stored in session
+                    $user_role = is_object($user) ? $user->getRole() : $user['role'];
+                }
+                if (!empty($user)) {
+                    if ($user_role == 'ROLE_ADMIN') {
+                    } else {
+                        throw new SecurityException('You are not allowed posts adding', Service::get('router')->buildRoute('home'));
+                    }
+                } else {
+                    throw new SecurityException('Authorization Required', Service::get('router')->buildRoute('login'));
+                }
             }
+
             //Service::get('session')->returnUrl = $route['pattern'];
+
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }else{
             //throw new \Exception($_SERVER['REQUEST_URI'] . ' not found');
@@ -151,12 +163,6 @@ class Application {
             // HttpNotFoundException покажет 404 ошибку
             //echo $e->getMessage();
             //}
-        catch(NotAuthException $e){
-            // Service::get('session')->set('returnUrl', Registry::getConfig('route')['pattern']);
-            // echo 'Reroute to login page';
-            // $e->getMessage();
-            $response = new ResponseRedirect(Service::get('router')->buildRoute('login'));
-        }
             //catch(BadResponseException $e){
             //echo $e->getMessage();
             //}

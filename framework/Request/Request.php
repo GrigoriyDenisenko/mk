@@ -83,4 +83,9 @@ class Request
         return (array_key_exists($name, $_GET)) ? htmlspecialchars($_GET[$name]) : null;
     }
 
+    public function getUri(){
+        // Prevent multiple slashes to avoid cross site requests via the FAPI.
+        return '/'.trim(trim($_SERVER['REQUEST_URI']),'/');
+    }
+
 }
