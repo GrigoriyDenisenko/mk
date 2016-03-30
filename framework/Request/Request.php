@@ -36,9 +36,9 @@ class Request
      */
     public function post($varname = '', $filter_name = 'STRING')
     {
-        echo "<hr>search string: ". $varname;
-        echo "<br>in post array:";
-        var_dump($_POST);
+        //echo "<hr>search string: ". $varname;
+        //echo "<br>in post array:";
+        //var_dump($_POST);
         if ($varname == 'password') {
             return array_key_exists($varname, $_POST) ? md5($this->filter($_POST[$varname], $filter_name)) : null;
         }

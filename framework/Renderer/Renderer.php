@@ -101,6 +101,10 @@ class Renderer {
 
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
 
+        // возьмем из сессии сохраненные данные не прошедшие валидацию
+        $post = Service::get('session')->getFromPost();
+        // теперь данные массива $post можно использовать в шаблоне через @$post->имя_поля
+
         if (file_exists($template_path)) {
             //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
             ob_start();
@@ -117,7 +121,6 @@ class Renderer {
             //echo "<HR>WRAP<BR>";
             $content = $this->renderMain($content);
         }
-
         return $content;
     }
 

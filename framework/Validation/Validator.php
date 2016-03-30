@@ -27,11 +27,7 @@ class Validator
     {
         $this->fields = get_object_vars($ActiveRecordObj);
         //$this->fields = $ActiveRecordObj->getFields();
-        //echo "<HR>Fields:";
-        //var_dump($this->fields);
         $this->rules = $ActiveRecordObj->getRules();
-        //echo "<HR>Rules:";
-        //var_dump($this->rules);
     }
 
     /**
@@ -42,9 +38,6 @@ class Validator
     public function isValid()
     {
         $final_validation_result = true; // Use the default validation behavior if the validation rules are absent
-
-        //$fields = $this->_model->getFields();
-        //$all_rules = $this->_model->getRules();
 
         foreach ($this->rules as $name => $filters) {
             if (array_key_exists($name, $this->fields)) {
@@ -60,7 +53,7 @@ class Validator
 
         // Store filled post fields in session to show them in renderer and give user a chance to correct them
         if ($final_validation_result === false) {
-            //Service::get('session')->setPost($this->_model);
+            Service::get('session')->savePost($this->fields);
         }
 
         return $final_validation_result;

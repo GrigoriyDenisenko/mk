@@ -8,6 +8,8 @@
 namespace Framework\Session;
 
 
+use Blog\Model\Post;
+
 class Session {
 
     public $messages = [];
@@ -49,4 +51,35 @@ class Session {
         }
         return $flash;
     }
+
+    /**
+     * Store the post data in the session.
+     *
+     * @param array $postdata
+     */
+    public function savePost($postdata)
+    {
+        //echo "Save post:";
+        //var_dump($postdata);
+        $_SESSION['post'] = $postdata;
+    }
+
+    /**
+     * Get the post data that are stored in the session.
+     *
+     * @return Post|null
+     */
+    public function getFromPost()
+    {
+        if (isset($_SESSION['post'])) {
+            $post = (object)$_SESSION['post'];
+            unset($_SESSION['post']);
+            //echo "<hr>from:";
+            //var_dump($post);
+            return $post;
+        }else{
+            return null;
+        }
+    }
+
 }
