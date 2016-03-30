@@ -2,8 +2,6 @@
 
 namespace Framework\Exception;
 
-use Exception;
-
 /**
  * Class DatabaseException
  * @package Framework\Exception

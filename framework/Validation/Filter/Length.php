@@ -22,4 +22,12 @@ class Length implements ValidationFilterInterface {
 
         return (strlen($value)>=$this->min) && (strlen($value)<=$this->max);
     }
+
+    /**
+     * Gets the error message by checking the value
+     */
+    public function getMessage()
+    {
+        return 'must be less than '.$this->max.' and more than '.$this->min.' characters';
+    }
 }

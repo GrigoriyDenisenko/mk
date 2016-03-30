@@ -13,7 +13,7 @@ use Framework\Model\ActiveRecord;
  */
 class Validator
 {
-    protected $fiels;
+    protected $fields;
     protected $rules;
     protected $_errors = [];
 
@@ -25,12 +25,13 @@ class Validator
      */
     public function __construct($ActiveRecordObj)
     {
-        $this->fiels = $ActiveRecordObj->getFields();
-        echo "<HR>Fields:";
-        var_dump($this->fiels);
+        $this->fields = get_object_vars($ActiveRecordObj);
+        //$this->fields = $ActiveRecordObj->getFields();
+        //echo "<HR>Fields:";
+        //var_dump($this->fields);
         $this->rules = $ActiveRecordObj->getRules();
-        echo "<HR>Rules:";
-        var_dump($this->rules);
+        //echo "<HR>Rules:";
+        //var_dump($this->rules);
     }
 
     /**
@@ -38,33 +39,32 @@ class Validator
      *
      * @return bool True if all fields of ActiveRecord object are valid
      */
-//    public function isValid()
-//    {
-//        $final_validation_result = true; // Use the default validation behavior if the validation rules are absent
-//
-//        //$fields = $this->_model->getFields();
-//        //$all_rules = $this->_model->getRules();
-//
-//        foreach ($this->rules as $name => $filters) {
-//            if (array_key_exists($name, $this->fiels)) {
-///*                foreach ($rules as $rule) {
-//                    $valid = $rule->isValid($fields[$name]);
-//                    if ($valid === false) {
-//
-//                        $this->_errors[$name] = ucfirst($name) . ' validation error';
-//                        $final_validation_result = false;
-//                    }
-//                }*/
-//            }
-//        }
-//
-//        // Store filled post fields in session to show them in renderer and give user a chance to correct them
-//        if ($final_validation_result === false) {
-//            //Service::get('session')->setPost($this->_model);
-//        }
-//
-//        return $final_validation_result;
-//    }
+    public function isValid()
+    {
+        $final_validation_result = true; // Use the default validation behavior if the validation rules are absent
+
+        //$fields = $this->_model->getFields();
+        //$all_rules = $this->_model->getRules();
+
+        foreach ($this->rules as $name => $filters) {
+            if (array_key_exists($name, $this->fields)) {
+                foreach ($filters as $rule) {
+                    $result = $rule->isValid($this->fields[$name]);
+                    if ($result === false) {
+                        $this->_errors[$name] = ucfirst($name) . ' validation error. '.$rule->getMessage();
+                        $final_validation_result = false;
+                    }
+                }
+            }
+        }
+
+        // Store filled post fields in session to show them in renderer and give user a chance to correct them
+        if ($final_validation_result === false) {
+            //Service::get('session')->setPost($this->_model);
+        }
+
+        return $final_validation_result;
+    }
 
     public function getErrors()
     {

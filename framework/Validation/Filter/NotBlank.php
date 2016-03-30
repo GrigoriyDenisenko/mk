@@ -24,7 +24,6 @@ class NotBlank implements ValidationFilterInterface {
 
     /**
      * Gets the error message by checking the value
-     * @return string
      */
     public function getMessage()
     {
