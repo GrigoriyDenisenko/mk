@@ -106,18 +106,25 @@ class Renderer {
 
         //echo "post2:";
         //var_dump($post);
-        if (empty($post)){
+        if (empty($post)) {
             // возьмем из сессии сохраненные данные не прошедшие валидацию
             $post = Service::get('session')->getFromPost();
             // теперь данные массива $post можно использовать в шаблоне через @$post->имя_поля
             //echo "post3:";
             //var_dump($post);
+        }else{
+            if (array_key_exists('id', $post)){
+                //echo "post:";
+                //var_dump($post);
+                $footer= '<br/><a>Edit post</a><br/><a>Delete post</a>';
+            }
         }
         if (file_exists($template_path)) {
             //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
             ob_start();
             include( $template_path ); //выгружаем в буфер шаблон (html.php)
-            $content = ob_get_contents(); //получаем содержимое текущего буфера в виде строки и очищаем его
+            $content = ob_get_contents().$footer; //получаем содержимое текущего буфера в виде строки и очищаем его
+
             ob_end_clean();
             //echo $content;
         } else {
