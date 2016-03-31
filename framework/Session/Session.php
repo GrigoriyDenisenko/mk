@@ -21,7 +21,7 @@ class Session {
     public function __set($name, $val){
         //echo "<hr>PUT TOO session: ".$name;
         $_SESSION[$name] = $val;
-        var_dump($_SESSION);
+        //var_dump($_SESSION);
     }
 
     public function __get($name){

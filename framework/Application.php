@@ -117,7 +117,7 @@ class Application {
     public function startController($controller_name, $action, Array $data = []) {
         try {
             if (!class_exists($controller_name)) {
-                throw new \Exception("Controller '$controller_name' not found ");
+                throw new \Exception("Controller '$controller_name' not found ",404);
             } else {
                 // проверяем, задан ли метод название+Action
                 $action = $action . 'Action';

@@ -79,8 +79,8 @@ class Renderer {
             $template_path=$this->templates_dir . $template_path;
         }
 
-        echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
-        var_dump($data);
+        //echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
+        //var_dump($data);
 
         // Подготовим функции, кот. вызываются из пользовательских шаблонов
 
