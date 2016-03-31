@@ -83,12 +83,13 @@ class Application {
 
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }else{
-            //throw new \Exception($_SERVER['REQUEST_URI'] . ' not found');
-            //$e = new HttpNotFoundException(ltrim($_SERVER['REQUEST_URI'],'/') . ' not found');
-            //$response = new Response(Service::get('renderer')->renderError($e));
-            //$response->send();
             // пользователь преднамеренно зашел на отсутствующий url
-            echo ltrim($_SERVER['REQUEST_URI'],'/') . ' not found';
+            //header('Status: 404 Not Found');
+            //echo '<html><body><h1>' . ltrim($_SERVER['REQUEST_URI'],'/') . ' - Page not found</h1></body></html>';
+            $response = new Response(Service::get('renderer')->renderError(
+                array('message' => ltrim($_SERVER['REQUEST_URI'],'/') . ' - Page not found' , 'code' => 404)));
+            $response->send();
+
         }
     }
 
@@ -168,10 +169,11 @@ class Application {
             //}
         catch(\Exception $e){
             // Do 500 layout...
-            echo $e->getMessage();
+            //echo $e->getMessage();
             //$renderer = new Renderer($e->layout, array('message'=>$e->message, 'code'=>$e->code));
             //$response = new Response($renderer->render());
-            $response = new Response(Service::get('renderer')->renderError($e), $e->getCode());
+            $response = new Response(Service::get('renderer')->renderError(
+                array('message'=>$e->getMessage(), 'code'=>$e->getCode())), $e->getCode());
         }
         $response->send();
     }

@@ -79,8 +79,8 @@ class Renderer {
             $template_path=$this->templates_dir . $template_path;
         }
 
-        //echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
-        //var_dump($data);
+        echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
+        var_dump($data);
 
         // Подготовим функции, кот. вызываются из пользовательских шаблонов
 
@@ -114,9 +114,10 @@ class Renderer {
             //var_dump($post);
         }else{
             if (array_key_exists('id', $post)){
-                //echo "post:";
+                //&&!empty($post['content']
+                //echo "post model:";
                 //var_dump($post);
-                $footer= '<br/><a>Edit post</a><br/><a>Delete post</a>';
+                $footer= '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a><br/><a href="/posts/' . $post->id . '/delete">Delete post</a>';
             }
         }
         if (file_exists($template_path)) {
@@ -147,8 +148,8 @@ class Renderer {
      * $error_template_file
      */
     public function renderError($data = array()){
-        echo "<hr>Err:";
-        var_dump($data);
+        //echo "<hr>Err:";
+        //var_dump($data);
         return $this->render($this->error_template,$data);
     }
 
