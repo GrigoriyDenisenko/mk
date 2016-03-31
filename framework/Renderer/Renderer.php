@@ -99,12 +99,20 @@ class Renderer {
             return Service::get('router')->buildRoute($name);
         };
 
+        //echo "post1:";
+        //var_dump($post);
+
         extract($data); // Импортирует переменные из массива в текущую таблицу символов
 
-        // возьмем из сессии сохраненные данные не прошедшие валидацию
-        $post = Service::get('session')->getFromPost();
-        // теперь данные массива $post можно использовать в шаблоне через @$post->имя_поля
-
+        //echo "post2:";
+        //var_dump($post);
+        if (empty($post)){
+            // возьмем из сессии сохраненные данные не прошедшие валидацию
+            $post = Service::get('session')->getFromPost();
+            // теперь данные массива $post можно использовать в шаблоне через @$post->имя_поля
+            //echo "post3:";
+            //var_dump($post);
+        }
         if (file_exists($template_path)) {
             //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
             ob_start();
