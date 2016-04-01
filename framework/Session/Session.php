@@ -82,4 +82,8 @@ class Session {
         }
     }
 
+    public function getSessID(){
+        return session_id();
+    }
+
 }

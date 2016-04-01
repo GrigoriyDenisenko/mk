@@ -23,16 +23,20 @@ class Security{
     }
 
     public function clear(){
-        Service::get('session')->delFromSess('user');
+        $session=Service::get('session');
+        $session->delFromSess('user');
+        $session->delFromSess('token');
     }
 
     public function generateToken(){
-        if (Service::get('session')->get('token')){
-            return Service::get('session')->get('token');
+        if (isset($_SESSION['token'])){
+            return $_SESSION['token'];
         }else{
-            $token = md5(Service::get('session')->getSessID());
+            $token = md5(Service::get('session')->getSessID().uniqid());
+            //$token = md5("test");
+            // записываем в кукис, чтобы токен запомнился при разрыве сессии
             setcookie('token', $token);
-            Service::get('session')->set('token', $token);
+            Service::get('session')->token = $token;
         }
     }
 
@@ -49,7 +53,7 @@ class Security{
         // сериализовать или взять те поля, кот. нужно хранить в сессии
         Service::get('session')->user = serialize($user);
         // чере __set: $_SESSION['is_authenticated'] = true
-        Service::get('session')->isAuthenticated=true;
+        //Service::get('session')->isAuthenticated=true;
         //echo "<hr>yes login: ";
         //echo Service::get('session')->isAuthenticated;
     }

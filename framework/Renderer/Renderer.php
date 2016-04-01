@@ -89,11 +89,19 @@ class Renderer {
             return Service::get('app')->startController($controller_name, $action, $data);
         };
 
+        // сгенерированный токен внедряется в страницу скрытым полем для последующей передачи через пост
         $generateToken = function(){
+            $token = Service::get('security')->generateToken();
+            //echo "token:";
+            //var_dump($token);
+            echo '<input type="hidden" value="'.$token.'" name="token">';
+        };
+
+        /*$generateToken = function(){
             $token = md5('solt_string'.uniqid());
             setcookie('token', $token);
             echo '<input type="hidden" value="'.$token.'" name="token">';
-        };
+        };*/
 
         $getRoute = function($name){
             return Service::get('router')->buildRoute($name);
