@@ -113,7 +113,7 @@ class Renderer {
             //echo "post3:";
             //var_dump($post);
         }else{
-            if (array_key_exists('id', $post)){
+            if (array_key_exists('id', $post) && Service::get('security')->isAuthenticated()){
                 //&&!empty($post['content']
                 //echo "post model:";
                 //var_dump($post);
