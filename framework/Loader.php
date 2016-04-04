@@ -40,6 +40,7 @@ class Loader{
 
         // зарегистрируем Namespace фреймворка
         self::addNamespacePath("Framework\\", __DIR__);
+        self::addNamespacePath('CMS\\',__DIR__.'/../src/CMS');
         // spl_autoload_register(array(__CLASS__, 'addNamespace'));
         // можно ещё добавить выгрузку через  spl_autoload_unregister()
     }

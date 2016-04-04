@@ -20,10 +20,25 @@ class Router{
 
         // переданный массив записывается в нашу карту маршрутов (protected array)
         // например:  возвращаемый из app\config\routes.php
-        // echo "<pre>";
-        // echo "----construct route MAP";
+        // echo "<HR>construct route MAP";
         self::$map = $routing_map;
-        //print_r(self::$map);
+        // var_dump(self::$map);
+        // 'pattern'       => '/posts/{id}/delete'
+        if (!array_key_exists("delete_post", self::$map)){
+            // echo "NOT FOUND";
+            $delete_array = array(
+                'pattern' => '/posts/{id}/delete',
+                'controller'    => 'CMS\\Controller\\BlogController',
+                'action'        => 'delete',
+                '_requirements' => array(
+                'id'      => '\d+',
+                '_method' => 'POST'));
+            //array_push(self::$map,'delete_post' => $delete_array);
+            //self::$map[]=array('delete_post' => $delete_array);
+            self::$map = array_merge(self::$map,array('delete_post' => $delete_array));
+            // echo "<HR>New:";
+            // var_dump(self::$map);
+        }
     }
 
     /**
