@@ -70,7 +70,8 @@ class Loader{
                 // echo "include_once " . $path;
                 include_once($path);
             }else{
-                echo "file " . $path." not exist!!!!!!!!!!!!!";
+                //echo "file " . $path." not exist!!!!!!!!!!!!!";
+                return false;
             }
         }
     }
