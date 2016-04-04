@@ -56,16 +56,18 @@ class Application {
     public function run(){
         $router = Service::get('router');
         $route =  $router->parseRoute();
-        //echo "<pre>ROUTE:  <br />";
+        //echo "<hr>ROUTE:  <br />";
         //var_dump($route);
         if (!empty($route)) {
             // Нашли маршрут, подготовимся к запуску контроллера
             // $controller_class = $route["controller"];
-            // $action = $route['action'];
-            // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
-            // print_r($route['params']);
-            // контроллер запустился, запишем откуда стартовали
-            if (!empty($route['security'])) {//check authorization on security pages
+            if (empty($route['security'])) {//check authorization on security pages
+                // $action = $route['action'];
+                if ($route['action'] == 'signin'){
+                    // генерируем новый токен для нового пользователя
+                    Service::get('security')->generateToken();
+                }
+            }else{
                 if ($user = Service::get('security')->getUser()) {  // Check the user role on the basis of user data stored in session
                     $user_role = is_object($user) ? $user->getRole() : $user['role'];
                 }
@@ -79,8 +81,11 @@ class Application {
                 }
             }
 
+            // контроллер запустился, запишем откуда стартовали
             //Service::get('session')->returnUrl = $route['pattern'];
 
+            // (Pоутер должен содержать массив 'params' взятый из URL, создается в методе parseRoute)
+            // print_r($route['params']);
             return $this->startController($route["controller"], $route['action'], $route['params']);
         }else{
             // пользователь преднамеренно зашел на отсутствующий url

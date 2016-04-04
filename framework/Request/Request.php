@@ -2,6 +2,8 @@
 
 namespace Framework\Request;
 
+use Framework\DI\Service;
+
 /**
  * Class Request
  * @package Framework\Request
@@ -38,7 +40,11 @@ class Request
     {
         //echo "<hr>search string: ". $varname;
         //echo "<br>in post array:";
-        //var_dump($_POST);
+        //var_dump($_REQUEST);
+        // проверим наличие и соответствие поля token в пришедшем POST запросе
+        if (!Service::get('security')->checkToken()){
+            return null;
+        }
         if ($varname == 'password') {
             return array_key_exists($varname, $_POST) ? md5($this->filter($_POST[$varname], $filter_name)) : null;
         }

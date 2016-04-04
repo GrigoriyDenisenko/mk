@@ -92,7 +92,7 @@ class Renderer {
         // сгенерированный токен внедряется в страницу скрытым полем для последующей передачи через пост
         $generateToken = function(){
             $token = Service::get('security')->generateToken();
-            //echo "token:";
+            //echo "hidden token:";
             //var_dump($token);
             echo '<input type="hidden" value="'.$token.'" name="token">';
         };
@@ -121,6 +121,7 @@ class Renderer {
             //echo "post3:";
             //var_dump($post);
         }else{
+            // если мы разворачиваем заданный пост пользователя:
             if (array_key_exists('id', $post) && Service::get('security')->isAuthenticated()){
                 //&&!empty($post['content']
                 //echo "post model:";

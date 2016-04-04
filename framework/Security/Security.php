@@ -17,8 +17,10 @@ class Security{
      * @return bool
      */
     public function isAuthenticated(){
-        //echo "<HR>Checks session if the user is authorized:";
+        //echo "<HR>Checks session if the user is authorized Session:";
         //var_dump($_SESSION);
+        //echo "<HR>Post:";
+        //var_dump($_POST);
         return !empty($_SESSION['user']);
     }
 
@@ -64,12 +66,19 @@ class Security{
     }
 
     public function checkToken(){
-        $token = (Service::get('request')->post('token'))?Service::get('request')->post('token'):null;
-        if(!is_null($token)){
-            return ($token == $_COOKIE['token'])?true:false;
-        }else{
-            return true;
+        if(!isset($_REQUEST['token'])||!isset( $_SESSION['token'])){
+            // в post запросе и куках (_POST+_COOKIE)нет поля token
+            // или в сессии нет записанного токена - не с чем сверять
+            return false;
         }
+        $session_token = $_SESSION['token'];
+        $post_token=$_REQUEST['token'];
+         //if (empty($session_token = Service::get('session')->getSessionToken($form))) { // Check if session is started and token is transmitted, if not return an error
+            // в сессии нет записанного токена - нес чем сверять
+            //return false;
+        //}
+        // если хоть один не пустой, проверяем на равенство, а иначе сразу = false
+        return (!empty($session_token.$post_token)) && ($session_token == $post_token) ? true : false;
 
     }
 
