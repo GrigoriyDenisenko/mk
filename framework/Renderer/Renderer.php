@@ -126,8 +126,17 @@ class Renderer {
                 //&&!empty($post['content']
                 //echo "post model:";
                 //var_dump($post);
-                $footer= '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a><br/>
-                  <a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
+                //echo "<hr>data:";
+                //var_dump ($data);
+                if (empty($data['edit'])) {
+                    $footer = '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a>';
+                }else{
+                    $footer='';
+                }
+                $footer= $footer.'<br/><a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
+
+//                $footer= '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a><br/>
+//                  <a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
             }
         }
         if (file_exists($template_path)) {

@@ -181,6 +181,33 @@ abstract class ActiveRecord {
         //$db->commit();
         if (!$res) throw new DatabaseException('Data save failed');
     }
+
+    /**
+     * update table
+     * @param $field
+     * @param $fieldValue
+     */
+    public function update($field, $fieldValue)
+    {
+        $fields = $this->getFields();
+        $query = '';
+        $values=array();
+        foreach ($fields as $col => $val) {
+            $query .= $col . '=:' . $col . ', ';
+            $values[':'.$col]=$val;
+        }
+        $query = trim($query);
+        $query = substr($query, 0, -1);
+        $db = Service::get('db');
+        $query = 'UPDATE `' . static::getTable() . '` SET ' . $query . ' WHERE ' . $field . '=:fieldValue';
+        $stmt = $db->prepare($query);
+        $values[':fieldValue']= $fieldValue;
+        $res=$stmt->execute($values);
+        if($res==false){
+            throw new DatabaseException('Update is failed');
+        }
+    }
+
     /**
      * @param $field
      * @param $fieldVal
