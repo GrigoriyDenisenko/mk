@@ -181,4 +181,17 @@ abstract class ActiveRecord {
         //$db->commit();
         if (!$res) throw new DatabaseException('Data save failed');
     }
+    /**
+     * @param $field
+     * @param $fieldVal
+     */
+    public function delete($field, $fieldVal){
+        $db=Service::get('db');
+        $query = 'DELETE FROM `' . static::getTable() . '` WHERE '.$field.'='.$fieldVal;
+        $res=$db->query($query);
+        if($res==false){
+            throw new DatabaseException('Delete is failed');
+        }
+
+    }
 }

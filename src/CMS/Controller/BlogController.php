@@ -28,26 +28,17 @@ class BlogController extends Controller
             $user = $security->getUser();
             //echo '<br>begin delete post User:';
             //var_dump($user);
-// TEST:
-            throw new SecurityException('The post delete successfully', Service::get('router')->buildRoute('home'));
-
-/*            if ($user->role == 'ROLE_ADMIN') {
-                if ($this->getRequest()->isPost()) {
-
-                    $post = new Post();
-                    // $post->delete('id', $id);
-                    echo '<HR>DELETED id:'.$id;
-                    return $this->redirect($this->generateRoute('home'), 'The post delete successfully');
-                }
-
+            //throw new SecurityException('The post delete successfully', Service::get('router')->buildRoute('home'));
+            if ($user->role == 'ROLE_ADMIN') {
+                $post = new Post();
+                $post->delete('id', $id);
+                return $this->redirect($this->generateRoute('home'), 'The post delete successfully');
             } else {
                 throw new SecurityException('You are not allowed posts updating', $this->getRequest()->getReferrer());
-            }*/
+            }
         }else{
             throw new SecurityException('Please, login', Service::get('router')->buildRoute('login'));
         }
-        //return $this->redirect('/');
-        //throw new SecurityException('Please, login', Service::get('route')->buildRoute('login'));
     }
 
 }
