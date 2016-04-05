@@ -23,11 +23,14 @@ class BlogController extends Controller
     public function deleteAction($id){
         $security=Service::get('security');
         if ($security->isAuthenticated()) {
-            echo '<HR>check role for DELETED post with id: '.$id;
+            //echo '<HR>check role for DELETED post with id: '.$id;
             //$route=Service::get('route');
             $user = $security->getUser();
-            echo '<br>begin delete post User:';
-            var_dump($user);
+            //echo '<br>begin delete post User:';
+            //var_dump($user);
+// TEST:
+            throw new SecurityException('The post delete successfully', Service::get('router')->buildRoute('home'));
+
 /*            if ($user->role == 'ROLE_ADMIN') {
                 if ($this->getRequest()->isPost()) {
 
@@ -41,7 +44,7 @@ class BlogController extends Controller
                 throw new SecurityException('You are not allowed posts updating', $this->getRequest()->getReferrer());
             }*/
         }else{
-            throw new SecurityException('Please, login', Service::get('route')->buildRoute('login'));
+            throw new SecurityException('Please, login', Service::get('router')->buildRoute('login'));
         }
         //return $this->redirect('/');
         //throw new SecurityException('Please, login', Service::get('route')->buildRoute('login'));

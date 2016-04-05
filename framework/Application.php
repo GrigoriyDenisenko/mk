@@ -63,7 +63,7 @@ class Application {
             // $controller_class = $route["controller"];
             if (empty($route['security'])) {//check authorization on security pages
                 // $action = $route['action'];
-                if ($route['action'] == 'signin'){
+                if (in_array($route['action'],array('signin','login'))){
                     // генерируем новый токен для нового пользователя
                     Service::get('security')->generateToken();
                 }
