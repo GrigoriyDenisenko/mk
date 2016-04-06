@@ -38,11 +38,29 @@ class Controller {
      * @return  Response
      */
     public function render($Layout, $Data = array()){
-        $class = get_called_class();
-        //new Response("test");
+        // определим полное имя контроллера: (например: CMS\Controller\ProfileController)
+        // $class = get_called_class();
+        // echo $class;
+        // var_dump(debug_backtrace());
+        // определим полный путь к текущему файлу контроллера:
+        // (например:  (/var/www/site_name/src/CMS/Controller/ProfileController.php)
+        $file = debug_backtrace()[0]["file"];
+        //echo "<br>".$file;
+        $ControllerName = str_replace('Controller.php','',basename($file));
+        //echo $ControllerName;
+        $viewFileName=$ControllerName."/".$Layout.".php";
+        // определим путь к шаблонам относительно контроллера
+        $pos = strrpos($file, "Controller/", -1);
+        $fullFileName=substr_replace($file, "views/".$viewFileName, $pos);
+        if (file_exists($fullFileName)){
+            $viewFileName=$fullFileName;
+        }
+        $content = Service::get('renderer')->render($viewFileName,$Data);
+
         //echo '<hr>CONTROLLER renderer input layout: <B>'. $Layout .'</B> from class: '.$class.' with DATA array:<BR>';
         //echo var_dump($Data);
-        $ControllerName = str_replace('Controller','',basename(str_replace('\\', DIRECTORY_SEPARATOR, $class)));
+        //$ControllerName = str_replace('Controller','',basename(str_replace('\\', DIRECTORY_SEPARATOR, $class)));
+        //echo "<hr>called_class: ".$class."<br/>class: ".$ctrl_class."<br/>controller: ".$ControllerName."<br/>name: ".$ControllerName."/".$Layout."<br/>DIR: ".__DIR__;
         // Renderer-у нужно передать полный путь к шаблону
         // Возьмем его из названия модели ($Layout)
         //$renderer = new Renderer($layout, $content);
@@ -50,7 +68,7 @@ class Controller {
         //$fullpath = realpath('...' . $layout);
         //$renderer = new Renderer('...'); // Try to define renderer like a service. e.g.: Service::get('renderer');
         //$content = $renderer->render($fullpath, $data);
-        $content = Service::get('renderer')->render($ControllerName."/".$Layout.".php",$Data);
+        //$content = Service::get('renderer')->render($ControllerName."/".$Layout.".php",$Data);
         //echo '<HR><B>Content:</B><BR>';
         //echo $content;
         return  new Response($content);

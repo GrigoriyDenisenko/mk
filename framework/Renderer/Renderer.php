@@ -76,6 +76,7 @@ class Renderer {
     public function render($template_path, $data = array(), $wrap = true){
 
         if (!file_exists($template_path)){
+            // если не указан полный путь к файлу(или по данному пути файл не найден), возьмем из конфига путь к шаблонам
             $template_path=$this->templates_dir . $template_path;
         }
 
@@ -129,6 +130,7 @@ class Renderer {
                 //echo "<hr>data:";
                 //var_dump ($data);
                 if (empty($data['edit'])) {
+                    // если это не режим редактирования, то добавляется кнопка редактирования
                     $footer = '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a>';
                 }else{
                     $footer='';
