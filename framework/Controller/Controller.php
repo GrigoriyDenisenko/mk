@@ -55,10 +55,10 @@ class Controller {
         if (file_exists($fullFileName)){
             $viewFileName=$fullFileName;
         }
+        //echo '<hr>CONTROLLER renderer input layout: <B>'. $viewFileName .'</B> with DATA array:<BR>';
+        //echo var_dump($Data);
         $content = Service::get('renderer')->render($viewFileName,$Data);
 
-        //echo '<hr>CONTROLLER renderer input layout: <B>'. $Layout .'</B> from class: '.$class.' with DATA array:<BR>';
-        //echo var_dump($Data);
         //$ControllerName = str_replace('Controller','',basename(str_replace('\\', DIRECTORY_SEPARATOR, $class)));
         //echo "<hr>called_class: ".$class."<br/>class: ".$ctrl_class."<br/>controller: ".$ControllerName."<br/>name: ".$ControllerName."/".$Layout."<br/>DIR: ".__DIR__;
         // Renderer-у нужно передать полный путь к шаблону

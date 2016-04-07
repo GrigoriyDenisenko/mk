@@ -3,7 +3,7 @@
     <?php if (!isset($errors)) {
         $errors = array();
     } ?>
-    <?php echo htmlspecialchars_decode($content).' '.$user->email; ?>
+    <?php echo htmlspecialchars_decode($title).' '.$username; ?>
     <form class="form-signin" role="form" method="post" action="<?php echo $getRoute('profile')?>">
         <h2 class="form-signin-heading">Change password</h2>
 

@@ -50,7 +50,12 @@ abstract class ActiveRecord {
             $query = $db->query($querystring);
             $check_query_result = $query;
         } elseif (is_numeric($mode)) { // Select record from the database table with specified ID
-            $querystring .= " WHERE id = :id";
+            if (isset($value)) {
+                // если нужно выбрать по другому идентификатору
+                $querystring .= " WHERE {$value} = :id";
+            }else{
+                $querystring .= " WHERE id = :id";
+            }
             $query = $db->prepare($querystring);
             $query->bindParam(":id", $mode, \PDO::PARAM_INT, 11);
             $check_query_result = $query->execute();
@@ -69,7 +74,8 @@ abstract class ActiveRecord {
             $query->bindParam(":value", $value);
             $check_query_result = $query->execute();
         } else {
-            return null;
+            throw new DatabaseException("Database select error");
+            //return null;
         }
 
         //echo '<BR>ActiveRecord find with mode '. $mode . ' TABLE: ' . $table.'<BR>querystring= '.$querystring;
@@ -94,12 +100,19 @@ abstract class ActiveRecord {
             return $result;
         }
 
-        if (is_numeric($mode) && isset($result[0])) {
+        if (is_numeric($mode)){
+             if (!isset($result[0])) {
+                 return null;
+             }
+            if (isset($value)) {
+                // по заданному идентификатору возвращаются все записи
+                return $result;
+            }
             // возвращаем одну строку
             return $result[0];
         }
 
-        return !empty($result) ? $result[0] : null;;
+        return !empty($result) ? $result[0] : null;
     }
 
     /**
@@ -131,7 +144,29 @@ abstract class ActiveRecord {
 
     protected function getFields(){
 
+        // Если мы в модели формируем список полей через свойства модели,
+        // то просто возвращаем все свойства данного класса-модели:
         return get_object_vars($this);
+
+        // В данном случае нам нельзя изменять класс модели
+        // поэтому используемые нами дополнительные поля возьмем из списка полей
+        // заданной таблицы ()
+        // в валидаторе Validator::fields возьмем через get_object_vars($ActiveRecordObj)
+
+/*        $db = Service::get('db');
+        $sql = "SHOW FIELDS FROM " . static::getTable();
+        $result = $db->query($sql);
+        $result = $result->fetchAll();
+
+        foreach ($result as $row) {
+            $fields[] = $row['Field'];
+        }
+        echo "<hr>FIELDS:";
+        var_dump($fields);
+
+        return $fields;*/
+
+
     }
 
     public function save(){
@@ -148,15 +183,6 @@ abstract class ActiveRecord {
         }*/
 
         $table = static::getTable();
-        if($table == 'users')
-        {
-            //echo "<hr>save to user_email: ".$fields['email'];
-            //var_dump($fields);
-
-            if (!empty(static::findByEmail($fields['email']))){
-                throw new DatabaseException('This E-mail already exist');
-            }
-        }
         $db = Service::get('db');
 
         $sth = $db->prepare('SHOW COLUMNS FROM '.$table);
@@ -166,15 +192,43 @@ abstract class ActiveRecord {
         while($row = $sth->fetch()) {
             $colums[] = $row['Field'];
         }
-        $query = "INSERT INTO ".$table." SET ";
-        foreach($fields as $key => $value){
-            if(array_search($key, $colums)){
-                $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
-            }
-        }
-        $query_part = implode(', ', $query_parts);
-        $query .= $query_part;
 
+        if (isset($this->id)) {
+            $query = "Update " . $table . " SET ";
+
+            $sql_fields = array();
+//            foreach (array_keys($fields) as $col_name)
+//                $query .= "$col_name = ?, ";
+
+            foreach ($fields as $key => $value) {
+                if (array_search($key, $colums) && $key != 'id' ) {
+                    $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                }
+            }
+            $query_part = implode(', ', $query_parts);
+            $query .= $query_part;
+            //$query = substr($query, 0, -2);
+            $query .= " WHERE id = " . $this->id . ";";
+
+        }else {
+            if($table == 'users')
+            {
+                //echo "<hr>save to user_email: ".$fields['email'];
+                //var_dump($fields);
+                if (!empty(static::findByEmail($fields['email']))){
+                    throw new DatabaseException('This E-mail already exist');
+                }
+            }
+            $query = "INSERT INTO " . $table . " SET ";
+            foreach ($fields as $key => $value) {
+                if (array_search($key, $colums)) {
+                    $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                }
+            }
+            $query_part = implode(', ', $query_parts);
+            $query .= $query_part;
+        }
+        //var_dump($query);
         //$db->beginTransaction();
         $sth = $db->prepare($query);
         $res = $sth->execute();
@@ -202,6 +256,7 @@ abstract class ActiveRecord {
         $query = 'UPDATE `' . static::getTable() . '` SET ' . $query . ' WHERE ' . $field . '=:fieldValue';
         $stmt = $db->prepare($query);
         $values[':fieldValue']= $fieldValue;
+        //var_dump($values);
         $res=$stmt->execute($values);
         if($res==false){
             throw new DatabaseException('Update is failed');
