@@ -141,31 +141,28 @@ abstract class ActiveRecord {
 
     PHP will call this magic method for every non-existent property passing in its name and value.*/
 
+    // используемые нами дополнительные поля возьмем из списка полей
+    // заданной таблицы ()
+
+    /*        $db = Service::get('db');
+            $sql = "SHOW FIELDS FROM " . static::getTable();
+            $result = $db->query($sql);
+            $result = $result->fetchAll();
+
+            foreach ($result as $row) {
+                $fields[] = $row['Field'];
+            }
+            echo "<hr>FIELDS:";
+            var_dump($fields);
+
+            return $fields;*/
+
 
     protected function getFields(){
 
-        // Если мы в модели формируем список полей через свойства модели,
-        // то просто возвращаем все свойства данного класса-модели:
+        // в классе-модели формируем список полей таблицы через свойства модели,
+        // теперь просто возвращаем все свойства данного класса-модели:
         return get_object_vars($this);
-
-        // В данном случае нам нельзя изменять класс модели
-        // поэтому используемые нами дополнительные поля возьмем из списка полей
-        // заданной таблицы ()
-        // в валидаторе Validator::fields возьмем через get_object_vars($ActiveRecordObj)
-
-/*        $db = Service::get('db');
-        $sql = "SHOW FIELDS FROM " . static::getTable();
-        $result = $db->query($sql);
-        $result = $result->fetchAll();
-
-        foreach ($result as $row) {
-            $fields[] = $row['Field'];
-        }
-        echo "<hr>FIELDS:";
-        var_dump($fields);
-
-        return $fields;*/
-
 
     }
 
@@ -193,23 +190,28 @@ abstract class ActiveRecord {
             $colums[] = $row['Field'];
         }
 
+        if (array_key_exists('edituser_id', $colums)) {
+            $EditUserID_replace = 'edituser_id=' . Service::get('security')->getUser()->id;
+        }else{
+            $EditUserID_replace = '';
+        }
+        echo "<hr>".$EditUserID_replace;
         if (isset($this->id)) {
             $query = "Update " . $table . " SET ";
-
-            $sql_fields = array();
-//            foreach (array_keys($fields) as $col_name)
-//                $query .= "$col_name = ?, ";
-
             foreach ($fields as $key => $value) {
-                if (array_search($key, $colums) && $key != 'id' ) {
-                    $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                if ($key == 'edituser_id'){
+                    $query_parts[] = $EditUserID_replace;
+                }else {
+                    if (array_search($key, $colums) && $key != 'id') {
+                        $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                    }
                 }
             }
             $query_part = implode(', ', $query_parts);
             $query .= $query_part;
             //$query = substr($query, 0, -2);
-            $query .= " WHERE id = " . $this->id . ";";
-
+            //$query .= " WHERE id = " . $this->id . ";";
+            $query .= " WHERE id = " . $this->id;
         }else {
             if($table == 'users')
             {
@@ -221,8 +223,12 @@ abstract class ActiveRecord {
             }
             $query = "INSERT INTO " . $table . " SET ";
             foreach ($fields as $key => $value) {
-                if (array_search($key, $colums)) {
-                    $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                if ($key == 'edituser_id'){
+                    $query_parts[] = $EditUserID_replace;
+                }else {
+                    if (array_search($key, $colums)) {
+                        $query_parts[] = sprintf("`%s`='%s'", $key, $fields[$key]);
+                    }
                 }
             }
             $query_part = implode(', ', $query_parts);
@@ -237,7 +243,7 @@ abstract class ActiveRecord {
     }
 
     /**
-     * update table
+     * update table if field on WHERE is not ID
      * @param $field
      * @param $fieldValue
      */
@@ -248,7 +254,7 @@ abstract class ActiveRecord {
         $values=array();
         foreach ($fields as $col => $val) {
             $query .= $col . '=:' . $col . ', ';
-            $values[':'.$col]=$val;
+            $values[':'.$col]=($col=='edituser_id')?Service::get('security')->getUser()->id:$val;
         }
         $query = trim($query);
         $query = substr($query, 0, -1);
