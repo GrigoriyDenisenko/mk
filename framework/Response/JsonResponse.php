@@ -18,24 +18,11 @@ class JsonResponse extends Response {
      * JsonResponse constructor.
      * @param string $array
      */
-    function __construct($array, $code = 200, $type = 'application/json') {
-        $this->content = $array;
+    function __construct($json_array, $code = 200, $type = 'application/json') {
+        if (empty($json_array)) {
+            $code = 500;
+            $json_array = new \ArrayObject();
+        }
+        parent::__construct(json_encode($json_array), $code, $type);
     }
-
-    /**
-     * Sets a header
-     */
-    private function getHeader(){
-        $currentCode = $this->code;
-        header('HTTP/1.1 ' . $currentCode . ' ' . self::$codeMessage[$currentCode]);
-        header('Content-Type: application/json; charset=utf-8');
-    }
-
-    /**
-     * Outputs a content
-     */
-    private function getContent() {
-        echo json_encode($this->content, JSON_UNESCAPED_UNICODE);
-    }
-
 }
