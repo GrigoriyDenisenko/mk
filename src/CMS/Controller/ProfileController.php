@@ -69,4 +69,16 @@ class ProfileController extends Controller
         return $this->render('profile.html', array('title'=>'This is your  personal pages',
             'username'=>$username, 'user'=>$user, 'posts'=>$posts));
     }
+
+    public function changepwdAction()
+    {
+        // формируем массив переменных и объектов для передачи в шаблон для изменения данных пользователя
+        $user=Service::get('security')->getUser();
+        $username= empty($user->name) ? $user->email : $user->name;
+        //$posts = Post::find('user_id',$user->id);
+        $posts = Post::find($user->id,'edituser_id');
+        // var_dump($posts);
+        //echo "<hr>USER: {$username}";
+        return $this->render('passwd.html', array('username'=>$username, 'user'=>$user));
+    }
 }

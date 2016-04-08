@@ -4,22 +4,21 @@
         $errors = array();
     } ?>
     <?php echo htmlspecialchars_decode($title).' '.$username; ?>
-    <form class="form-signin" role="form" method="post" action="<?php echo $getRoute('profile')?>">
-        <h2 class="form-signin-heading">Change password</h2>
+    <div class="row">
+        <div class="col-md-5 profile_block">
+            <span class="pull-left profile glyphicon glyphicon-user" aria-hidden="true"></span>
+            <a href="<?php echo $getRoute('change_pwd')?>" type="button" class="fancybox edit btn btn-primary">Change password</a>
+            <dl class="user-info col-md-3">
+                <dt>User id:</dt>
+                <dd><?=$user->id?></dd>
+                <dt>User role:</dt>
+                <dd><?=$user->role?></dd>
+                <dt>User email:</dt>
+                <dd><?=$user->email?></dd>
+            </dl>
+        </div>
 
-        <?php foreach ($errors as $error) { ?>
-            <div class="alert alert-danger alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
-                        class="sr-only">Close</span></button>
-                <strong>Error!</strong> <?php echo $error ?>
-            </div>
-        <?php } ?>
-        <input type="email" class="form-control" placeholder="Email address" required autofocus name="email" disabled value="<?php echo $user->email?>"><br/>
-        <input type="password" class="form-control" placeholder="Password" required name="password">
-        <input type="password" class="form-control" placeholder="New password" required name="newpassword1">
-        <input type="password" class="form-control" placeholder="Confirm new password" required name="newpassword2">
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Update password</button>
-        <?php $generateToken()?>
-    </form>
+    </div>
+    <?php $generateToken()?>
 
 </div>

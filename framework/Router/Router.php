@@ -33,9 +33,16 @@ class Router{
                 '_requirements' => array(
                 'id'      => '\d+',
                 '_method' => 'POST'));
+            $change_pwd = array(
+                'pattern' => '/profile/pwd',
+                'controller'    => 'CMS\\Controller\\ProfileController',
+                'action'        => 'changepwd');
+
             //array_push(self::$map,'delete_post' => $delete_array);
             //self::$map[]=array('delete_post' => $delete_array);
-            self::$map = array_merge(self::$map,array('delete_post' => $delete_array));
+            self::$map = array_merge(self::$map,array(
+                'delete_post' => $delete_array,
+                'change_pwd'  => $change_pwd));
             // echo "<HR>New:";
             // var_dump(self::$map);
         }
