@@ -94,4 +94,11 @@ class Request
         return '/'.trim(trim($_SERVER['REQUEST_URI']),'/');
     }
 
+    /**
+     * Возвращает aдрес страницы (если есть), которая привела браузер пользователя на эту страницу
+     */
+    public function getReferrer(){
+        return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/';
+    }
+
 }

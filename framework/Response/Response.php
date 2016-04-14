@@ -93,7 +93,7 @@ class Response
     {
         $this->content = $content;
         $this->code = $code;
-        $this->type = $type;
+        $this->type = $type.'; charset=utf-8';
         //echo '<hr>CREATE RESPONSE with code: ' . $code;
         $this->setHeader('Content-Type', $this->type);
     }

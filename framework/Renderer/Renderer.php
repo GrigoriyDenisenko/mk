@@ -14,9 +14,10 @@ class Renderer {
      * @var string  Main wrapper template file location
      */
 
-    protected $main_template = '';
+    protected $main_template  = '';
     protected $error_template = '';
-    protected $templates_dir = '';
+    protected $templates_dir  = '';
+    protected $txt_reclama    ='';
 
     /**
      * Class instance constructor
@@ -34,6 +35,8 @@ class Renderer {
             $this->main_template = $main_template_file;
             $this->error_template = $error_template_file;
             $this->templates_dir=dirname($main_template_file)."/";
+            $this->txt_reclama='<a style="color: LightGray" href="'.$config["reclama_lnk"].'">'.
+                $config["reclama_txt"].'</a>';
             // echo "<BR>main_template_file is set to: ".$main_template_file ;
         }else{
             // echo "Template NOT FOUND <BR>";
@@ -135,7 +138,7 @@ class Renderer {
                 }else{
                     $footer='';
                 }
-                $footer= $footer.'<br/><a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
+                $footer = $footer. '<br/><a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
 
 //                $footer= '<br/><a href="/posts/' . $post->id . '/edit">Edit post</a><br/>
 //                  <a style="color: red" href="/posts/' . $post->id . '/delete">Delete post</a>';
@@ -156,6 +159,9 @@ class Renderer {
         if($wrap){
             // наш шаблон находится внутри главного шаблона
             //echo "<HR>WRAP<BR>";
+            if (!empty($this->txt_reclama)){
+                $content .= '<br/><br/>'.$this->txt_reclama;
+            }
             $content = $this->renderMain($content);
         }
         return $content;
