@@ -18,6 +18,7 @@ class Renderer {
     protected $error_template = '';
     protected $templates_dir  = '';
     protected $txt_reclama    ='';
+    private $content;
 
     /**
      * Class instance constructor
@@ -52,10 +53,15 @@ class Renderer {
      *
      * @return html/text
      */
-    public function renderMain($content){
+    private function renderMain(){
+        //public function renderMain($content){
         //echo "<BR>RendererMain<BR> ";
         $flush = Service::get('session')->getFlash();
         $user = Service::get('security')->getUser();
+        if (!empty($this->txt_reclama)){
+            $reclama = '<br/><br/>'.$this->txt_reclama;
+        }
+        $content=$this->content;
         //echo "Get USER: ";
         //var_dump($user);
         //$this->content = $content;
@@ -64,7 +70,7 @@ class Renderer {
         // content - ранее сгенерированный контент
         // user - параметры текущего пользователя
         // flush - сессионные сообщения
-        return $this->render($this->main_template, compact('content', 'user', 'flush'), false);
+        return $this->render($this->main_template, compact('content', 'user', 'flush', 'reclama'), false);
     }
 
     /**
@@ -146,11 +152,23 @@ class Renderer {
         }
         if (file_exists($template_path)) {
             //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE); // Включение буферизации вывода
-            ob_start();
+            if (!empty($reclama)){
+                $footer .= $reclama;
+            }
+            //ob_start(PHP_OUTPUT_HANDLER_CLEANABLE);
+            ob_start(null, 0, PHP_OUTPUT_HANDLER_CLEANABLE | PHP_OUTPUT_HANDLER_REMOVABLE);
+            //ob_start();
             include( $template_path ); //выгружаем в буфер шаблон (html.php)
-            $content = ob_get_contents().$footer; //получаем содержимое текущего буфера в виде строки и очищаем его
-
-            ob_end_clean();
+            $this->content = ob_get_contents().$footer; //получаем содержимое текущего буфера в виде строки и очищаем его
+            //$content = ob_get_contents().$footer; //получаем содержимое текущего буфера в виде строки и очищаем его
+            //$content = ob_get_clean().$footer; //получаем содержимое текущего буфера в виде строки и очищаем его
+            if (!ob_end_clean()){
+                ob_end_clean();
+            }
+            while (ob_get_length()) {
+                //echo '<hr>!!!!!!!!';
+                ob_end_clean();
+            }
             //echo $content;
         } else {
             throw new \Exception('File ' . $template_path . ' not found');
@@ -159,12 +177,15 @@ class Renderer {
         if($wrap){
             // наш шаблон находится внутри главного шаблона
             //echo "<HR>WRAP<BR>";
-            if (!empty($this->txt_reclama)){
-                $content .= '<br/><br/>'.$this->txt_reclama;
-            }
-            $content = $this->renderMain($content);
+//            if (!empty($this->txt_reclama)){
+//                $content .= '<br/><br/>'.$this->txt_reclama;
+//            }
+            //echo $content;
+            //$content = $this->renderMain($content);
+            $this->content = $this->renderMain();
         }
-        return $content;
+        return $this->content;
+        //return $content;
     }
 
     /**
