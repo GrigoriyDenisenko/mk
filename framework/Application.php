@@ -42,9 +42,11 @@ class Application {
             // получим подключение к базе
             // extract(Service::get('config')['pdo']);
             // $dns .= ';charset=utf8';
-            // $db = new \PDO($dns, $user, $password);
-            // Service::set('db', $db);
-            Service::set('db', new \PDO($config['pdo']['dsn'], $config['pdo']['user'], $config['pdo']['password']));
+            //$db = new \PDO($dsn, $user, $password);
+            $db = new \PDO($config['pdo']['dsn'].';charset=utf8', $config['pdo']['user'], $config['pdo']['password']);
+            $db->query("SET NAMES 'utf8'");
+            Service::set('db', $db);
+            //Service::set('db', new \PDO($config['pdo']['dsn'].';charset=utf8', $config['pdo']['user'], $config['pdo']['password']));
         }catch(\PDOException $e){
             echo $e->getMessage();die();
         }
