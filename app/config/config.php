@@ -5,8 +5,10 @@ return array(
     'routes'      => include('routes.php'),
     'main_layout' => __DIR__.'/../../src/Blog/views/layout.html.php',
     'error_500'   => __DIR__.'/../../src/Blog/views/500.html.php',
+    'reclama_txt'     => 'ho - бесплатный хостинг!',
+    'reclama_lnk'     => 'http://www.ho.ua/',
     'pdo'         => array(
-        'dns'      => 'mysql:dbname=education;host=192.168.64.15',
+        'dsn'      => 'mysql:dbname=education;host=localhost',
         'user'     => 'education',
         'password' => 'n29OB4uIYGii'
     ),
