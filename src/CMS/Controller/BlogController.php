@@ -61,8 +61,12 @@ class BlogController extends Controller
         }else{
             throw new SecurityException('Please, login', Service::get('router')->buildRoute('login'));
         }
-        $renderer = Service::get('renderer');
-        return new Response($renderer->render(__DIR__ . '/../../Blog/views/Post/add.html.php', array('action' => $this->generateRoute('edit'), 'post' => isset($post)?$post:null, 'edit'=>'edit mode', 'errors' => isset($error)?$error:null)));
+        //$renderer = Service::get('renderer');
+        //return new Response($renderer->render(__DIR__ . '/../../Blog/views/Post/add.html.php', array('action' => $this->generateRoute('edit'), 'post' => isset($post)?$post:null, 'edit'=>'edit mode', 'errors' => isset($error)?$error:null)));
+        //return $this->render('update.html',
+            //array('action' => $this->generateRoute('edit'), 'edit'=>'edit mode', 'errors' => isset($error)?$error:null));
+        return $this->render('update.html',
+            array('action' => $this->generateRoute('edit_post'), 'post' => isset($post)?$post:null, 'edit'=>'edit mode', 'errors' => isset($error)?$error:null));
     }
 
     public function deleteAction($id){

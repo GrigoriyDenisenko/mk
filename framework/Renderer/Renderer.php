@@ -92,6 +92,7 @@ class Renderer {
         //echo "<BR>Renderer->render with template <B>". $template_path ."</B> and data array:";
         //var_dump($data);
 
+        //echo '<hr>action: '.$action;
         // Подготовим функции, кот. вызываются из пользовательских шаблонов
 
         $include = function($controller_name, $action, Array $data = []) {
@@ -174,7 +175,7 @@ class Renderer {
             throw new \Exception('File ' . $template_path . ' not found');
         }
 
-        if($wrap){
+        if($wrap) {
             // наш шаблон находится внутри главного шаблона
             //echo "<HR>WRAP<BR>";
 //            if (!empty($this->txt_reclama)){
